@@ -6,7 +6,7 @@
   beStrictAboutCoversAnnotation="true"
   beStrictAboutOutputDuringTests="false"
   beStrictAboutTodoAnnotatedTests="true"
-  bootstrap="vendor/autoload.php"
+  bootstrap="tests/bootstrap.php"
   cacheResult="true"
   cacheResultFile="build/phpunit/.result.cache"
   colors="true"
@@ -19,30 +19,16 @@
   testdox="true"
   verbose="true">
 
-  <!-- Testsuites -->
   <testsuites>
-    <!-- Unit Testing -->
     <testsuite name="unit">
       <directory>tests/Suites/Unit</directory>
     </testsuite>
 
-    <!-- Integration Testing -->
     <testsuite name="integration">
       <directory>tests/Suites/Integration</directory>
     </testsuite>
-
-    <!-- Functional Testing -->
-    <testsuite name="functional">
-      <directory>tests/Suites/Functional</directory>
-    </testsuite>
-
-    <!-- Acceptance Testing -->
-    <testsuite name="acceptance">
-      <directory>tests/Suites/Acceptance</directory>
-    </testsuite>
   </testsuites>
 
-  <!-- Coverage -->
   <coverage cacheDirectory="build/phpunit/coverage/.cache">
     <include>
       <directory suffix=".php">src</directory>
@@ -54,7 +40,6 @@
     </report>
   </coverage>
 
-  <!-- Logging -->
   <logging>
     <junit outputFile="build/phpunit/logs/report.junit.xml"/>
     <teamcity outputFile="build/phpunit/logs/teamcity.txt"/>
