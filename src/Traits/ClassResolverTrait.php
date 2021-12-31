@@ -49,8 +49,8 @@ trait ClassResolverTrait
     {
         $class = SwitchCase::studly($class);
 
-        if (static::CONVENTION) {
-            $class = sprintf(static::CONVENTION, $class);
+        if ($this->getClassConvention()) {
+            $class = sprintf($this->getClassConvention(), $class);
         }
 
         return $class;
@@ -82,5 +82,10 @@ trait ClassResolverTrait
         }
 
         return false;
+    }
+
+    protected function getClassConvention(): ?string
+    {
+        return null;
     }
 }
