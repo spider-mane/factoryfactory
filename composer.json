@@ -19,12 +19,14 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "php": "^7.4 || ^8.0",
-    "symfony/polyfill-php80": "^1.23",
-    "symfony/polyfill-php81": "^1.23"
+    "php": "^8.0",
+    "jawira/case-converter": "^3.5",
+    "symfony/polyfill-php81": "^1.23",
+    "symfony/polyfill-php82": "^1.23"
   },
   "require-dev": {
     "captainhook/captainhook": "^5.10",
+    "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
     "fakerphp/faker": "^1.16",
     "friendsofphp/php-cs-fixer": "^3.4",
     "mockery/mockery": "^1.4",
@@ -36,10 +38,11 @@
     "psy/psysh": "^0.11",
     "spatie/phpunit-watcher": "^1.12",
     "squizlabs/php_codesniffer": "^3.5",
-    "vimeo/psalm": "^4.7",
+    "suin/phpcs-psr4-sniff": "^3.0",
     "vlucas/phpdotenv": "^5.4",
-    "voku/stringy": "^6.4",
-    "webtheory/exterminate": "@stable"
+    "webtheory/exterminate": "@dev",
+    "webtheory/path-builder": "@dev",
+    "webtheory/playground": "@dev"
   },
   "autoload": {
     "psr-4": {
@@ -52,25 +55,31 @@
     }
   },
   "scripts": {
+    "analyze": "vendor/bin/phpstan analyze",
     "bench": "vendor/bin/phpbench",
     "check": "vendor/bin/phpcs",
     "collect": "vendor/bin/var-dump-server",
     "env": "cp -n .env.example .env && bin/build-paths",
-    "fix": "vendor/bin/php-cs-fixer",
     "hooks": "vendor/bin/captainhook",
-    "inspect": "vendor/bin/psalm",
     "lint": "vendor/bin/parallel-lint",
+    "play": "php @playground/console.php",
     "shell": "vendor/bin/psysh",
     "test": "vendor/bin/phpunit",
     "watch": "vendor/bin/phpunit-watcher",
     "build": [
-      "@fix",
       "@check",
-      "@inspect",
+      "@analyze",
       "@test"
     ],
-    "post-install-cmd": [
-      "@env"
+    "setup": [
+      "composer install",
+      "cp -n .env.example .env",
+      "vendor/bin/build-paths",
+      "vendor/bin/make-playground"
+    ],
+    "style": [
+      "vendor/bin/php-cs-fixer fix --verbose",
+      "vendor/bin/phpcbf"
     ]
   },
   "config": {
@@ -78,16 +87,28 @@
     "sort-packages": true,
     "process-timeout": 0,
     "allow-plugins": {
-      "composer/package-versions-deprecated": true
+      "composer/installers": true,
+      "composer/package-versions-deprecated": true,
+      "phpstan/extension-installer": true,
+      "symfony/thanks": true,
+      "dealerdirect/phpcodesniffer-composer-installer": true
     }
   },
   "extra": {
     "build-paths": {
       "build": {
-        "phpunit": {},
-        "php-cs-fixer": {}
+        "php-cs-fixer": {},
+        "phpcs": {},
+        "phpstan": {},
+        "phpunit": {}
       },
       "logs": {}
+    },
+    "playground": {
+      "contexts": [
+        "console"
+      ],
+      "bootstrap": "tests/bootstrap.php"
     }
   }
 }

@@ -1,29 +1,38 @@
-# Dev and CI
+# Local development files
 *.cache
+/@playground
 /build/
+/cache/
 /dist/
 /logs/
-cghooks.lock
-docker-compose.override.yml
+/temp/
 
 # Composer
 /vendor/
 composer.lock
+/studio.json
+captainhook.config.json
+cghooks.lock
+
+# Docker
+docker-compose.override.yml
+/docker/@local/
 
 # Env
 *.env
 .env.*
-.*.env
 !.env.example
-!.env.*.example
-!.example.env
-!example.env
 
 # Editor/ IDE
 *.code-workspace
-.idea/
-.project/
-.vscode/
+.vscode
+.idea
+.project
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # System files
 .DS_Store

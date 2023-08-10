@@ -1,0 +1,12 @@
+// For format details, see https://aka.ms/devcontainer.json.
+{
+  "name": "factoryfactory",
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "../docker-compose.override.yml"
+  ],
+  "service": "app",
+  "remoteUser": "factoryfactory",
+  "workspaceFolder": "/app",
+  "shutdownAction": "none"
+}

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+readonly user="factoryfactory"
+readonly default_shell="zsh"
+
+evaluate_shell_arg() {
+  shells="bash dash rbash sh zsh"
+  shell=
+
+  for option in $shells; do
+    if [ "$option" = "$1" ]; then
+      shell="$1"
+      break
+    fi
+  done
+
+  if [ -z "$shell" ]; then
+    echo "Argument must be a valid shell. Available options are: ${shells// /, }."
+    exit 1
+  fi
+}
+
+if [ -n "$1" ]; then
+  evaluate_shell_arg "$1"
+fi
+
+docker compose up -d --wait &&
+  docker compose exec -u "$user" app "${shell:-$default_shell}" -il

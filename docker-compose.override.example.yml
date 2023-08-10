@@ -1,0 +1,35 @@
+services:
+  app:
+    build:
+      target: app-interactive
+      args:
+        LANG: "${LANG:-en_US.UTF-8}"
+        TZ: 'America/New_York'
+        UNMINIMIZE: true
+        GIT_USER:
+        GIT_EMAIL:
+        GIT_DEFAULT_BRANCH: "master"
+        GIT_INSTALL_GCM: false
+    environment:
+      HOST_UID: 1000
+      HOST_GID: 1000
+      TERM: "${TERM}"
+      ZSH_THEME: "powerlevel10k/powerlevel10k"
+    volumes:
+      # Source
+      - ".:/app"
+      # Dependencies
+      - "app.composer:/app/vendor"
+      - "app.npm:/app/assets/node_modules"
+      # Auth
+      - "~/.config/composer/auth.json:/home/factoryfactory/.config/composer/auth.json"
+      # VS Code server
+      - "vscode:/home/factoryfactory/.vscode-server"
+
+volumes:
+  app.composer:
+    driver: local
+  app.npm:
+    driver: local
+  vscode:
+    driver: local

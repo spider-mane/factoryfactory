@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# boilerplate files that need to be created before creating container
+readonly root="$(dirname $(dirname $(realpath $0)))"
+readonly files=(
+  .env.example
+  docker-compose.override.example.yml
+  studio.example.json
+)
+
+for file in ${files[@]}; do
+  cp -n "${root}/${file}" "${root}/${file//.example/}"
+done
