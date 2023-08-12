@@ -17,7 +17,7 @@
   printerClass="NunoMaduro\Collision\Adapters\Phpunit\Printer"
   processIsolation="false"
   stopOnFailure="true"
-  testdox="true"
+  testdox="false"
   verbose="true"
 >
   <testsuites>
