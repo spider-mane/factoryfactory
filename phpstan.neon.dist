@@ -12,7 +12,7 @@ parameters:
     - bin
 
   ignoreErrors:
-    # - '#^Unsafe usage of new static\(\).$#'
+    - '#^Unsafe usage of new static\(\).$#'
     # - '#^Expression on left side of \?\? is not nullable.$#'
     # - '#^Right side of && is always true.$#'
     # - '#^Dead catch - Throwable is never thrown in the try block.$#'

@@ -12,6 +12,7 @@ use Tests\Support\Fixtures\Namespaces\DummyNamespace3\DummyClass7;
 use Tests\Support\Fixtures\Namespaces\DummyNamespace3\DummyClass8;
 use Tests\Support\Fixtures\Namespaces\DummyNamespace3\DummyClass9;
 use Tests\Support\UnitTestCase;
+use WebTheory\Factory\Interfaces\ClassResolverInterface;
 use WebTheory\Factory\Resolver\ClassResolver;
 
 class ClassResolverTest extends UnitTestCase
@@ -36,6 +37,13 @@ class ClassResolverTest extends UnitTestCase
 
     protected ClassResolver $sut;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->sut = $this->createSut([]);
+    }
+
     protected function createSut(array $args): ClassResolver
     {
         return new ClassResolver(
@@ -44,6 +52,22 @@ class ClassResolverTest extends UnitTestCase
             $args['namespaces'] ?? [],
             $args['convention'] ?? '%s',
         );
+    }
+
+    /**
+     * @test
+     * @dataProvider requiredInterfacesData
+     */
+    public function it_implements_the_required_interfaces(string $interface)
+    {
+        $this->assertInstanceOf($interface, $this->sut);
+    }
+
+    public function requiredInterfacesData(): array
+    {
+        return [
+            $this->iut($i = ClassResolverInterface::class) => [$i],
+        ];
     }
 
     /**
