@@ -3,9 +3,10 @@
 namespace WebTheory\Factory\Resolver;
 
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
+use WebTheory\Factory\Resolver\Abstracts\AbstractClassResolver;
 use WebTheory\Factory\Resolver\Abstracts\DynamicClassResolverTrait;
 
-class Namespaces implements ClassResolverInterface
+class Namespaces extends AbstractClassResolver implements ClassResolverInterface
 {
     use DynamicClassResolverTrait;
 
@@ -20,7 +21,7 @@ class Namespaces implements ClassResolverInterface
         //
     }
 
-    public function getClass(string $arg): string|false
+    protected function performQuery(string $arg): string|false
     {
         foreach ($this->namespaces as $namespace) {
             $class = $this->getFullyQualifiedName($namespace, $arg);

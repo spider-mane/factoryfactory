@@ -3,9 +3,10 @@
 namespace WebTheory\Factory\Resolver;
 
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
+use WebTheory\Factory\Resolver\Abstracts\AbstractClassResolver;
 use WebTheory\Factory\Resolver\Abstracts\DynamicClassResolverTrait;
 
-class ClassList implements ClassResolverInterface
+class ClassList extends AbstractClassResolver implements ClassResolverInterface
 {
     use DynamicClassResolverTrait;
 
@@ -20,7 +21,7 @@ class ClassList implements ClassResolverInterface
         //
     }
 
-    public function getClass(string $arg): string|false
+    protected function performQuery(string $arg): string|false
     {
         foreach ($this->classes as $class) {
             if ($this->isMatchingClass($class, $arg) && class_exists($class)) {
