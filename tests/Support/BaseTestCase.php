@@ -48,4 +48,10 @@ abstract class BaseTestCase extends TestCase
     {
         $this->caseConverter = new CaseConverter();
     }
+
+    protected function dummyArg(): string
+    {
+        return $this->caseConverter->convert($this->fake->words(3, true))
+            ->toSnake();
+    }
 }

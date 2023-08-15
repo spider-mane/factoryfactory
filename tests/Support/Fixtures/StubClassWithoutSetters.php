@@ -6,10 +6,10 @@ class StubClassWithoutSetters
 {
     public function __construct(
         protected $valueOne,
-        protected $valueTwo,
-        protected $valueThree,
-        protected $valueFour,
-        protected $valueFive,
+        protected $valueTwo = null,
+        protected $valueThree = null,
+        protected $valueFour = null,
+        protected $valueFive = null
     ) {
         //
     }

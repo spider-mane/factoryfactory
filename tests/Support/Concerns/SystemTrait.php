@@ -17,6 +17,9 @@ trait SystemTrait
         return $system->{$method}(...array_values($args));
     }
 
+    /**
+     * Data set
+     */
     protected static function ds(): FormattedDataSet
     {
         return new FormattedDataSet();
@@ -30,20 +33,16 @@ trait SystemTrait
     /**
      * "Method Under Test" template for use as keys in data providers.
      */
-    protected static function mut(string $method, string $extra = ''): string
+    protected static function mut(string $method): FormattedDataSet
     {
-        $method = static::ds()->method($method)->get();
-
-        return $extra ? "{$method}, {$extra}" : $method;
+        return static::ds()->method($method);
     }
 
     /**
      * Interface under test
      */
-    protected static function iut(string $interface, string $extra = ''): string
+    protected static function iut(string $interface): FormattedDataSet
     {
-        $interface = static::ds()->set('interface', $interface)->get();
-
-        return $extra ? "{$interface}, {$extra}" : $interface;
+        return static::ds()->set('interface', $interface);
     }
 }

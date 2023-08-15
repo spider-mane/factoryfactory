@@ -1,24 +1,39 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WebTheory\Factory\Engine;
 
 use InvalidArgumentException;
+use LogicException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
-use WebTheory\Factory\Abstracts\ConvertsCaseTrait;
+use ReflectionParameter;
+use WebTheory\Factory\Interfaces\ArgumentResolverInterface;
+use WebTheory\Factory\Interfaces\ArgValueTransformerInterface;
 use WebTheory\Factory\Interfaces\FactoryEngineInterface;
+use WebTheory\Factory\Interfaces\SetterResolverInterface;
+use WebTheory\Factory\Resolver\CamelCaseSetterResolver;
+use WebTheory\Factory\Resolver\SnakeArgsCamelParams;
+use WebTheory\Factory\Transformation\OriginalValue;
 
 class FactoryEngine implements FactoryEngineInterface
 {
-    use ConvertsCaseTrait;
+    protected SetterResolverInterface $setterResolver;
 
-    public const SETTER_PREFIXES = ['set', 'with', ''];
+    protected ArgumentResolverInterface $argResolver;
+
+    protected ?ArgValueTransformerInterface $valueTransformer;
 
     public function __construct(
-        protected array $setterPrefixes = self::SETTER_PREFIXES
+        ?SetterResolverInterface $setterResolver = null,
+        ?ArgumentResolverInterface $argResolver = null,
+        ?ArgValueTransformerInterface $valueTransformer = null,
     ) {
-        //
+        $this->setterResolver = $setterResolver ?? new CamelCaseSetterResolver();
+        $this->argResolver = $argResolver ?? new SnakeArgsCamelParams();
+        $this->valueTransformer = $valueTransformer ?? new OriginalValue();
     }
 
     public function generate(string $class, array $args = []): object
@@ -26,105 +41,121 @@ class FactoryEngine implements FactoryEngineInterface
         $reflection = new ReflectionClass($class);
         $instance = $this->constructInstance($reflection, $args);
 
-        return $this->defineInstance($reflection, $instance, $args);
+        return $this->refineInstance($reflection, $instance, $args);
     }
 
-    protected function constructInstance(ReflectionClass $reflection, array &$args): object
+    protected function constructInstance(ReflectionClass $class, array &$args): object
     {
-        return $reflection->newInstance(
-            ...$this->getConstructorArgs($reflection, $args)
-        );
+        $with = ($constructor = $class->getConstructor())
+            ? $this->getConstructorArgs($constructor, $args)
+            : [];
+
+        return $class->newInstance(...$with);
     }
 
-    public function getConstructorArgs(ReflectionClass $reflection, array &$args): array
+    public function getConstructorArgs(ReflectionMethod $constructor, array &$args): array
     {
-        $construct = [];
         $keys = $this->convertKeysToParameters($args);
-        $constructor = $reflection->getConstructor();
-        $params = $constructor ? $constructor->getParameters() : [];
 
-        foreach ($params as $param) {
+        $extracted = [];
+
+        foreach ($constructor->getParameters() as $param) {
             if (in_array($name = $param->getName(), $keys)) {
-                $arg = $this->convertToArg($name);
-                $construct[] = $args[$arg];
+                $arg = $this->convertParamToArg($name);
+                $extracted[] = $this->parseArg($arg, $args[$arg], $param);
 
                 unset($args[$arg]);
             } else {
                 try {
-                    $construct[] = $param->getDefaultValue();
-                } catch (ReflectionException $message) {
-                    throw new InvalidArgumentException($message);
+                    $extracted[] = $param->getDefaultValue();
+                } catch (ReflectionException $e) {
+                    throw new LogicException($e->getMessage());
                 }
             }
         }
 
-        return $construct;
+        $lastArg = array_pop($extracted);
+
+        return $this->isVariadicArgument($constructor, $lastArg)
+            ? [...$extracted, ...$lastArg]
+            : [...$extracted, $lastArg];
     }
 
     protected function convertKeysToParameters(array $args): array
     {
-        return array_map(function ($key) {
-            return $this->convertToParam($key);
-        }, array_keys($args));
+        return array_map([$this, 'convertArgToParam'], array_keys($args));
     }
 
-    protected function convertToArg(string $param): string
+    protected function convertArgToParam(string $arg): string
     {
-        return $this->convertCase($param)->toSnake();
+        return $this->argResolver->getArgAsParam($arg);
     }
 
-    protected function convertToParam(string $arg): string
+    protected function convertParamToArg(string $param): string
     {
-        return $this->convertCase($arg)->toCamel();
+        return $this->argResolver->getParamAsArg($param);
     }
 
-    protected function defineInstance(ReflectionClass $reflection, object $instance, array &$args): object
+    protected function parseArg(string $name, mixed $value, ReflectionParameter $param): mixed
     {
-        $setterPrefixes = $this->setterPrefixes;
+        return $this->valueTransformer->transformArg($name, $value, $param);
+    }
 
-        foreach ($args as $property => $value) {
-            $set = false;
+    protected function isVariadicArgument(ReflectionMethod $method, mixed $arg): bool
+    {
+        if (!$method->isVariadic() || !is_array($arg)) {
+            return false;
+        }
 
-            foreach ($setterPrefixes as $prefix) {
-                $setter = $this->convertToSetter($property, $prefix);
+        $params = $method->getParameters();
 
-                if ($reflection->hasMethod($setter)) {
-                    $this->invokeSetterMethod(
-                        $reflection->getMethod($setter),
-                        $instance,
-                        $value
-                    );
-                    $set = true;
-
-                    break;
+        // @phpstan-ignore-next-line
+        if ('array' === end($params)->getType()?->getName()) {
+            foreach ($arg as $entry) {
+                if (!is_array($entry)) {
+                    return false;
                 }
             }
+        }
 
-            if (!$set) {
-                throw new InvalidArgumentException(
-                    "{$property} is not a settable property of {$reflection->name}"
-                );
+        return true;
+    }
+
+    protected function refineInstance(ReflectionClass $class, object $instance, array &$args): object
+    {
+        foreach ($args as $property => $value) {
+            if ($setter = $this->resolveSetter($class, $property)) {
+                $setter = $class->getMethod($setter);
+                $params = $setter->getParameters();
+                $arg = $this->parseArg($property, $value, reset($params));
+
+                $this->invokeSetterMethod($setter, $instance, $arg);
+            } else {
+                throw $this->unresolvableArgException($class, $property);
             }
         }
 
         return $instance;
     }
 
-    protected function convertToSetter(string $property, string $prefix = 'set'): string
+    protected function resolveSetter(ReflectionClass $class, string $property): string|false
     {
-        $toCase = $prefix ? 'toPascal' : 'toCamel';
-
-        return $prefix . $this->convertCase($property)->$toCase();
+        return $this->setterResolver->getSetter($class, $property);
     }
 
     protected function invokeSetterMethod(ReflectionMethod $method, object $instance, mixed $value): void
     {
-        $parameter = $method->getParameters()[0];
-
-        if ($parameter->isVariadic() && is_array($value)) {
+        if ($this->isVariadicArgument($method, $value)) {
             $method->invoke($instance, ...$value);
         } else {
             $method->invoke($instance, $value);
         }
+    }
+
+    protected function unresolvableArgException(ReflectionClass $class, string $property): InvalidArgumentException
+    {
+        return new InvalidArgumentException(
+            "Could not resolve method to set {$property} on {$class->name}."
+        );
     }
 }

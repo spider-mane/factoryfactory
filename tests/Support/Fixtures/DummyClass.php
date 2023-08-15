@@ -2,7 +2,7 @@
 
 namespace Tests\Support\Fixtures;
 
-class ClassWithNoConstructor
+class DummyClass
 {
     //
 }

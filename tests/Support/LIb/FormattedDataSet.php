@@ -6,14 +6,18 @@ use Stringable;
 
 class FormattedDataSet implements Stringable
 {
+    public const FORMAT = '%s=%s';
+
+    public const DELIMITER = ', ';
+
     /**
-     * @var array<string, list{string, string}>
+     * @var array<string, list{string, string|bool|null}>
      */
     protected array $entries;
 
     public function __construct(
-        protected string $format = '%s=%s',
-        protected string $delimiter = ', '
+        protected string $format = self::FORMAT,
+        protected string $delimiter = self::DELIMITER
     ) {
         //
     }
@@ -34,9 +38,12 @@ class FormattedDataSet implements Stringable
     /**
      * @return $this
      */
-    public function set(string $key, string $val): static
+    public function set(string $key, string|bool|null $val): static
     {
-        $this->entries[$key] = [$key, $val];
+        $this->entries[$key] = [$key, match (true) {
+            is_bool($val) => $val ? 'true' : 'false',
+            default => $val
+        }];
 
         return $this;
     }
@@ -45,7 +52,7 @@ class FormattedDataSet implements Stringable
     {
         return implode($this->delimiter, array_map(
             fn ($data) => sprintf($this->format, ...$data),
-            $this->entries
+            array_filter($this->entries, fn ($data) => isset($data[1]))
         ));
     }
 

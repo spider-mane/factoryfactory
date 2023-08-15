@@ -65,8 +65,10 @@ class ClassResolverTest extends UnitTestCase
 
     public function requiredInterfacesData(): array
     {
+        $ds = fn (string $interface) => $this->iut($interface)->get();
+
         return [
-            $this->iut($i = ClassResolverInterface::class) => [$i],
+            $ds($i = ClassResolverInterface::class) => [$i],
         ];
     }
 
@@ -85,8 +87,12 @@ class ClassResolverTest extends UnitTestCase
 
     public function strategicClassResolutionData(): array
     {
+        $ds = fn (string $strategy) => $this->ds()
+            ->set('strategy', $strategy)
+            ->get();
+
         return [
-            'strategy=map' => [
+            $ds('map') => [
                 'args' => [
                     'map' => [
                         ($query = 'dummy') => ($expect = DummyClass1::class),
@@ -96,7 +102,7 @@ class ClassResolverTest extends UnitTestCase
                 'expect' => $expect,
             ],
 
-            'strategy=list' => [
+            $ds('list') => [
                 'args' => [
                     'classes' => [
                         DummyClass1::class,
@@ -108,7 +114,7 @@ class ClassResolverTest extends UnitTestCase
                 'expect' => $expect,
             ],
 
-            'strategy=namespaces' => [
+            $ds('namespaces') => [
                 'args' => [
                     'namespaces' => static::DUMMY_NAMESPACES,
                 ],
@@ -140,8 +146,12 @@ class ClassResolverTest extends UnitTestCase
     {
         $classConvention = 'DummyClass%s';
 
+        $ds = fn (string $strategy) => $this->ds()
+            ->set('strategy', $strategy)
+            ->get();
+
         return [
-            'strategy=list' => [
+            $ds('list') => [
                 'convention' => $classConvention,
                 'args' => [
                     'classes' => [
@@ -158,7 +168,7 @@ class ClassResolverTest extends UnitTestCase
                 'expect' => $expect,
             ],
 
-            'strategy=namespaces' => [
+            $ds('namespaces') => [
                 'convention' => $classConvention,
                 'args' => [
                     'namespaces' => static::DUMMY_NAMESPACES,
@@ -187,34 +197,39 @@ class ClassResolverTest extends UnitTestCase
         $invalidClass = 'InvalidNamespace\AnotherInvalidNamespace\InvalidClass';
         $invalidQuery = 'invalid_class';
 
+        $ds = fn (string $strategy, bool $match) => $this->ds()
+            ->set('strategy', $strategy)
+            ->set('match', $match)
+            ->get();
+
         return [
-            'strategy=map, match=false' => [
+            $ds('map', false) => [
                 'args' => [
                     'map' => ['dummy' => static::DUMMY_CLASSES[4]],
                 ],
                 'query' => $invalidQuery,
             ],
-            'strategy=map, match=true' => [
+            $ds('map', true) => [
                 'args' => [
                     'map' => [$invalidQuery => $invalidClass],
                 ],
                 'query' => $invalidQuery,
             ],
 
-            'strategy=list, match=false' => [
+            $ds('list', false) => [
                 'args' => [
                     'classes' => static::DUMMY_CLASSES,
                 ],
                 'query' => $invalidQuery,
             ],
-            'strategy=list, match=true' => [
+            $ds('list', true) => [
                 'args' => [
                     'classes' => [$invalidClass],
                 ],
                 'query' => $invalidQuery,
             ],
 
-            'strategy=namespaces, match=false' => [
+            $ds('namespaces', false) => [
                 'args' => [
                     'namespaces' => static::DUMMY_NAMESPACES,
                 ],
