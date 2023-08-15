@@ -2,7 +2,7 @@
 
 namespace WebTheory\Factory\Interfaces;
 
-interface FactoryInterface
+interface FlexFactoryInterface
 {
     public function create(string $class, array $args = []): object;
 }
