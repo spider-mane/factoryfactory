@@ -15,6 +15,8 @@ trait GeneratorTrait
     /**
      * Create an indexed array of specified count using a callback to generate
      * each entry.
+     *
+     * @return list<mixed>
      */
     protected static function dummyList(callable $generator, int $count = 10): array
     {
