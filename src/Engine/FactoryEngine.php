@@ -12,6 +12,7 @@ use ReflectionMethod;
 use ReflectionParameter;
 use WebTheory\Factory\Interfaces\ArgumentResolverInterface;
 use WebTheory\Factory\Interfaces\ArgValueTransformerInterface;
+use WebTheory\Factory\Interfaces\ClassArgumentInterface;
 use WebTheory\Factory\Interfaces\FactoryEngineInterface;
 use WebTheory\Factory\Interfaces\SetterResolverInterface;
 use WebTheory\Factory\Resolver\CamelCaseSetterResolver;
@@ -53,7 +54,7 @@ class FactoryEngine implements FactoryEngineInterface
         return $class->newInstance(...$with);
     }
 
-    public function getConstructorArgs(ReflectionMethod $constructor, array &$args): array
+    protected function getConstructorArgs(ReflectionMethod $constructor, array &$args): array
     {
         $keys = $this->convertKeysToParameters($args);
 
@@ -98,7 +99,11 @@ class FactoryEngine implements FactoryEngineInterface
 
     protected function parseArg(string $name, mixed $value, ReflectionParameter $param): mixed
     {
-        return $this->valueTransformer->transformArg($name, $value, $param);
+        $value = $this->valueTransformer->transformArg($name, $value, $param);
+
+        return $value instanceof ClassArgumentInterface
+            ? $this->generate($value->getClass(), $value->getArgs())
+            : $value;
     }
 
     protected function isVariadicArgument(ReflectionMethod $method, mixed $arg): bool
@@ -125,11 +130,11 @@ class FactoryEngine implements FactoryEngineInterface
     {
         foreach ($args as $property => $value) {
             if ($setter = $this->resolveSetter($class, $property)) {
-                $setter = $class->getMethod($setter);
-                $params = $setter->getParameters();
+                $reflection = $class->getMethod($setter);
+                $params = $reflection->getParameters();
                 $arg = $this->parseArg($property, $value, reset($params));
 
-                $this->invokeSetterMethod($setter, $instance, $arg);
+                $this->invokeSetterMethod($reflection, $instance, $arg);
             } else {
                 throw $this->unresolvableArgException($class, $property);
             }
@@ -143,12 +148,12 @@ class FactoryEngine implements FactoryEngineInterface
         return $this->setterResolver->getSetter($class, $property);
     }
 
-    protected function invokeSetterMethod(ReflectionMethod $method, object $instance, mixed $value): void
+    protected function invokeSetterMethod(ReflectionMethod $setter, object $instance, mixed $value): void
     {
-        if ($this->isVariadicArgument($method, $value)) {
-            $method->invoke($instance, ...$value);
+        if ($this->isVariadicArgument($setter, $value)) {
+            $setter->invoke($instance, ...$value);
         } else {
-            $method->invoke($instance, $value);
+            $setter->invoke($instance, $value);
         }
     }
 

@@ -19,7 +19,7 @@ trait HasExpectedTypes
 
     public function expectedTypesData(): array
     {
-        return $this->defineRequiredTypesData(
+        return $this->defineExpectedTypesData(
             fn (string $type) => $this->data('type', $type)->get()
         );
     }
@@ -27,5 +27,5 @@ trait HasExpectedTypes
     /**
      * @param callable(string $interface) $ds
      */
-    abstract protected function defineRequiredTypesData(callable $ds): array;
+    abstract protected function defineExpectedTypesData(callable $ds): array;
 }

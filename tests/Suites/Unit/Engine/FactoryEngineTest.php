@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Suites\Unit\Engine;
 
 use InvalidArgumentException;
@@ -18,13 +20,23 @@ use Tests\Support\Fixtures\StubClassWithVariadicArraySetter;
 use Tests\Support\Fixtures\StubClassWithVariadicConstructor;
 use Tests\Support\Fixtures\StubClassWithVariadicSetter;
 use Tests\Support\Fixtures\StubClassWithWithers;
+use Tests\Support\Partials\HasExpectedTypes;
 use Tests\Support\UnitTestCase;
 use WebTheory\Factory\Engine\FactoryEngine;
 use WebTheory\Factory\Interfaces\ArgValueTransformerInterface;
+use WebTheory\Factory\Interfaces\ClassArgumentInterface;
 use WebTheory\Factory\Interfaces\FactoryEngineInterface;
 
 class FactoryEngineTest extends UnitTestCase
 {
+    use HasExpectedTypes;
+
+    protected const TRANSFORMATION_METHOD = 'transformArg';
+
+    protected const GET_CLASS_METHOD = 'getClass';
+
+    protected const GET_ARGS_METHOD = 'getArgs';
+
     protected FactoryEngine $sut;
 
     /**
@@ -32,8 +44,15 @@ class FactoryEngineTest extends UnitTestCase
      */
     protected ArgValueTransformerInterface $valueTransformer;
 
-    protected function assertObjectMatchesArgs(object $object, array $args): void
+    /**
+     * @var MockObject&ClassArgumentInterface
+     */
+    protected ClassArgumentInterface $classArgument;
+
+    protected function assertObjectMatchesArgs(object $object, array $args, string $class): void
     {
+        $this->assertInstanceOf($class, $object);
+
         foreach ($args as $key => $val) {
             $this->assertSame($val, $this->invokeValueGetter($object, $key));
         }
@@ -43,9 +62,17 @@ class FactoryEngineTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->valueTransformer = $this->createMock(ArgValueTransformerInterface::class);
+        $mock = [$this, 'createMock'];
+
+        $this->valueTransformer = $mock(ArgValueTransformerInterface::class);
+        $this->classArgument = $mock(ClassArgumentInterface::class);
 
         $this->sut = new FactoryEngine();
+    }
+
+    protected function getSutWithArgValueTransformer(): FactoryEngine
+    {
+        return new FactoryEngine(null, null, $this->valueTransformer);
     }
 
     protected function getValueGetter(string $prop): string
@@ -58,19 +85,23 @@ class FactoryEngineTest extends UnitTestCase
         return $object->{$this->getValueGetter($prop)}();
     }
 
-    /**
-     * @test
-     * @dataProvider requiredInterfacesData
-     */
-    public function it_implements_the_required_interfaces(string $interface)
+    protected function getDummyArgs(string ...$types): array
     {
-        $this->assertInstanceOf($interface, $this->sut);
+        $types = $types ?: ['word', 'sentence'];
+        $generator = $this->randomFakeFactory(...$types);
+        $keys = [
+            'value_one',
+            'value_two',
+            'value_three',
+            'value_four',
+            'value_five',
+        ];
+
+        return $this->dummyMap($generator, $keys);
     }
 
-    public function requiredInterfacesData(): array
+    protected function defineExpectedTypesData(callable $ds): array
     {
-        $ds = fn (string $interface) => $this->iut($interface)->get();
-
         return [
             $ds($i = FactoryEngineInterface::class) => [$i],
         ];
@@ -84,7 +115,7 @@ class FactoryEngineTest extends UnitTestCase
     {
         $result = $this->sut->generate($class, $args);
 
-        $this->assertObjectMatchesArgs($result, $args);
+        $this->assertObjectMatchesArgs($result, $args, $class);
     }
 
     public function objectCreationData(): array
@@ -165,7 +196,7 @@ class FactoryEngineTest extends UnitTestCase
     {
         $result = $this->sut->generate($class, $args);
 
-        $this->assertObjectMatchesArgs($result, $args);
+        $this->assertObjectMatchesArgs($result, $args, $class);
     }
 
     public function variadicValuesData(): array
@@ -216,7 +247,7 @@ class FactoryEngineTest extends UnitTestCase
 
         $result = $this->sut->generate($class, $args);
 
-        $this->assertObjectMatchesArgs($result, $expected);
+        $this->assertObjectMatchesArgs($result, $expected, $class);
     }
 
     public function variadicParameterWithArrayTypeData(): array
@@ -285,7 +316,7 @@ class FactoryEngineTest extends UnitTestCase
         $this->sut = new FactoryEngine(null, null, $this->valueTransformer);
 
         # Expect
-        $this->valueTransformer->method('transformArg')
+        $this->valueTransformer->method(static::TRANSFORMATION_METHOD)
             ->with($key, $val, new IsInstanceOf(ReflectionParameter::class))
             ->willReturn($transformation);
 
@@ -313,12 +344,64 @@ class FactoryEngineTest extends UnitTestCase
                 ],
                 'transform' => $this->fake->colorName(),
             ],
+
             $ds('setter') => [
                 'class' => StubClassWithSetters::class,
                 'args' => [
                     'value_one' => $this->fake->name(),
                 ],
                 'transform' => $this->fake->company(),
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider argTransformedIntoClassArgumentData
+     */
+    public function it_creates_defined_object_if_arg_is_transformed_into_class_argument_instance(
+        string $initialClass,
+        array $initialArgs
+    ) {
+        $keys = array_keys($initialArgs);
+
+        $nestedClass = StubClassWithConstructorAndSetters::class;
+        $nestedArgs = $this->getDummyArgs();
+
+        $this->valueTransformer->method(static::TRANSFORMATION_METHOD)
+            ->willReturnOnConsecutiveCalls($this->classArgument, ...$nestedArgs);
+
+        $this->classArgument->method(static::GET_CLASS_METHOD)
+            ->willReturn($nestedClass);
+
+        $this->classArgument->method(static::GET_ARGS_METHOD)
+            ->willReturn($nestedArgs);
+
+        $this->sut = $this->getSutWithArgValueTransformer();
+
+        $result = $this->invokeValueGetter(
+            $this->sut->generate($initialClass, $initialArgs),
+            reset($keys),
+        );
+
+        $this->assertObjectMatchesArgs($result, $nestedArgs, $nestedClass);
+    }
+
+    public function argTransformedIntoClassArgumentData(): array
+    {
+        $this->initFaker();
+
+        $ds = fn (string $via) => $this->data('via', $via)->get();
+
+        return [
+            $ds('constructor') => [
+                'class' => StubClassWithoutSetters::class,
+                'key' => $this->getDummyArgs(),
+            ],
+
+            $ds('setter') => [
+                'class' => StubClassWithSetters::class,
+                'key' => $this->getDummyArgs(),
             ],
         ];
     }

@@ -49,7 +49,7 @@ class CompositeArgValueTransformerTest extends UnitTestCase
         );
     }
 
-    protected function defineRequiredTypesData(callable $ds): array
+    protected function defineExpectedTypesData(callable $ds): array
     {
         return [
             $ds($i = ArgValueTransformerInterface::class) => [$i],

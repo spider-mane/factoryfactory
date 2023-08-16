@@ -17,6 +17,16 @@ trait FakeGeneratorTrait
         return $this->dummyMap($this->uniqueGeneratorFactory(...$types), $keys);
     }
 
+    protected function randomFakeFactory(string ...$types): callable
+    {
+        return fn () => $this->fake->{$types[array_rand($types)]}();
+    }
+
+    protected function randomUniqueFactory(string ...$types): callable
+    {
+        return fn () => $this->unique->{$types[array_rand($types)]}();
+    }
+
     protected function fakeGeneratorFactory(string ...$types): callable
     {
         $set = $this->fakeGeneratorSet(...$types);
