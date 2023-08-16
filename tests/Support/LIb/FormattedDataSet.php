@@ -11,7 +11,7 @@ class FormattedDataSet implements Stringable
     public const DELIMITER = ', ';
 
     /**
-     * @var array<string, list{string, string|bool|null}>
+     * @var array<string, list{string, ?string}>
      */
     protected array $entries;
 
@@ -38,10 +38,12 @@ class FormattedDataSet implements Stringable
     /**
      * @return $this
      */
-    public function set(string $key, string|bool|null $val): static
+    public function set(string $key, string|int|bool|null $val): static
     {
         $this->entries[$key] = [$key, match (true) {
+            is_string($val) && str_contains($val, ' ') => "'{$val}'",
             is_bool($val) => $val ? 'true' : 'false',
+            is_int($val) => strval($val),
             default => $val
         }];
 

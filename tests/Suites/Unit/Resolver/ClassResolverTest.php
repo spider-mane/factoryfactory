@@ -11,12 +11,15 @@ use Tests\Support\Fixtures\Namespaces\DummyNamespace2\DummyClass6;
 use Tests\Support\Fixtures\Namespaces\DummyNamespace3\DummyClass7;
 use Tests\Support\Fixtures\Namespaces\DummyNamespace3\DummyClass8;
 use Tests\Support\Fixtures\Namespaces\DummyNamespace3\DummyClass9;
+use Tests\Support\Partials\HasExpectedTypes;
 use Tests\Support\UnitTestCase;
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
 use WebTheory\Factory\Resolver\ClassResolver;
 
 class ClassResolverTest extends UnitTestCase
 {
+    use HasExpectedTypes;
+
     protected const DUMMY_CLASSES = [
         DummyClass1::class,
         DummyClass2::class,
@@ -54,19 +57,8 @@ class ClassResolverTest extends UnitTestCase
         );
     }
 
-    /**
-     * @test
-     * @dataProvider requiredInterfacesData
-     */
-    public function it_implements_the_required_interfaces(string $interface)
+    protected function defineExpectedTypesData(callable $ds): array
     {
-        $this->assertInstanceOf($interface, $this->sut);
-    }
-
-    public function requiredInterfacesData(): array
-    {
-        $ds = fn (string $interface) => $this->iut($interface)->get();
-
         return [
             $ds($i = ClassResolverInterface::class) => [$i],
         ];

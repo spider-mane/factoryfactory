@@ -9,6 +9,7 @@ use Jawira\CaseConverter\CaseConverterInterface;
 use PHPUnit\Framework\TestCase;
 use Tests\Support\Concerns\AssertionsTrait;
 use Tests\Support\Concerns\FakeGeneratorTrait;
+use Tests\Support\Concerns\FormattedDataSetsTrait;
 use Tests\Support\Concerns\MockeryTrait;
 use Tests\Support\Concerns\ProphecyTrait;
 use Tests\Support\Concerns\SystemTrait;
@@ -17,6 +18,7 @@ abstract class BaseTestCase extends TestCase
 {
     use AssertionsTrait;
     use FakeGeneratorTrait;
+    use FormattedDataSetsTrait;
     use MockeryTrait;
     use ProphecyTrait;
     use SystemTrait;

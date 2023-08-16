@@ -6,6 +6,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionParameter;
 use stdClass;
+use Tests\Support\Partials\HasExpectedTypes;
 use Tests\Support\UnitTestCase;
 use WebTheory\Factory\Interfaces\ArgValueTransformerInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryInterface;
@@ -14,6 +15,8 @@ use WebTheory\Factory\Transformation\ObjectCreatorFromRepository;
 
 class ObjectCreatorFromRepositoryTest extends UnitTestCase
 {
+    use HasExpectedTypes;
+
     protected ObjectCreatorFromRepository $sut;
 
     protected string $classKey = ObjectCreatorFromRepository::DEFAULT_CLASS_KEY;
@@ -48,19 +51,8 @@ class ObjectCreatorFromRepositoryTest extends UnitTestCase
         );
     }
 
-    /**
-     * @test
-     * @dataProvider requiredInterfacesData
-     */
-    public function it_implements_the_required_interfaces(string $interface)
+    protected function defineExpectedTypesData(callable $ds): array
     {
-        $this->assertInstanceOf($interface, $this->sut);
-    }
-
-    public function requiredInterfacesData(): array
-    {
-        $ds = fn (string $interface) => $this->iut($interface)->get();
-
         return [
             $ds($i = ArgValueTransformerInterface::class) => [$i],
         ];

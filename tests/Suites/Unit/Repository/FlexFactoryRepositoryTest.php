@@ -3,6 +3,7 @@
 namespace Tests\Suites\Unit\Repository;
 
 use PHPUnit\Framework\MockObject\MockObject;
+use Tests\Support\Partials\HasExpectedTypes;
 use Tests\Support\UnitTestCase;
 use WebTheory\Factory\Interfaces\FlexFactoryInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryRepositoryInterface;
@@ -10,6 +11,8 @@ use WebTheory\Factory\Repository\FlexFactoryRepository;
 
 class FlexFactoryRepositoryTest extends UnitTestCase
 {
+    use HasExpectedTypes;
+
     protected FlexFactoryRepository $sut;
 
     /**
@@ -31,19 +34,8 @@ class FlexFactoryRepositoryTest extends UnitTestCase
         ]);
     }
 
-    /**
-     * @test
-     * @dataProvider requiredInterfacesData
-     */
-    public function it_implements_the_required_interfaces(string $interface)
+    protected function defineExpectedTypesData(callable $ds): array
     {
-        $this->assertInstanceOf($interface, $this->sut);
-    }
-
-    public function requiredInterfacesData(): array
-    {
-        $ds = fn (string $interface) => $this->iut($interface)->get();
-
         return [
             $ds($i = FlexFactoryRepositoryInterface::class) => [$i],
         ];

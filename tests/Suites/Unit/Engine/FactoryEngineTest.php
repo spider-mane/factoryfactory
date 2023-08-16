@@ -88,7 +88,6 @@ class FactoryEngineTest extends UnitTestCase
     protected function getDummyArgs(string ...$types): array
     {
         $types = $types ?: ['word', 'sentence'];
-        $generator = $this->randomFakeFactory(...$types);
         $keys = [
             'value_one',
             'value_two',
@@ -97,7 +96,7 @@ class FactoryEngineTest extends UnitTestCase
             'value_five',
         ];
 
-        return $this->dummyMap($generator, $keys);
+        return $this->uniqueMap($keys, $types);
     }
 
     protected function defineExpectedTypesData(callable $ds): array

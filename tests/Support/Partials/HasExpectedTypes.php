@@ -2,11 +2,11 @@
 
 namespace Tests\Support\Partials;
 
-use Tests\Support\Concerns\SystemTrait;
+use Tests\Support\Concerns\FormattedDataSetsTrait;
 
 trait HasExpectedTypes
 {
-    use SystemTrait;
+    use FormattedDataSetsTrait;
 
     /**
      * @test
