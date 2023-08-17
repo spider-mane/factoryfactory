@@ -8,36 +8,38 @@ trait DynamicClassResolverTrait
 {
     use ConvertsCaseTrait;
 
-    protected function getUnqualifiedName(string $class): string
+    protected ?string $convention;
+
+    protected function getUqn(string $class): string
     {
         $parts = explode('\\', $class);
 
         return end($parts);
     }
 
-    protected function getFullyQualifiedName(string $namespace, string $class): string
+    protected function getFqn(string ...$parts): string
     {
-        return $namespace . '\\' . $this->getClassName($class);
+        return implode('\\', $parts);
     }
 
-    protected function getClassName(string $class): string
+    protected function getArgAsQualifiedClass(string $namespace, string $arg): string
     {
-        $class = $this->convertToClass($class);
+        return $this->getFqn($namespace, $this->getArgAsClass($arg));
+    }
 
-        if ($convention = $this->getClassConvention()) {
+    protected function getArgAsClass(string $arg): string
+    {
+        $class = $this->convertArgToClassFormat($arg);
+
+        if ($convention = $this->convention) {
             $class = sprintf($convention, $class);
         }
 
         return $class;
     }
 
-    protected function convertToClass(string $class): string
+    protected function convertArgToClassFormat(string $arg): string
     {
-        return $this->convertCase($class)->toPascal();
-    }
-
-    protected function getClassConvention(): string
-    {
-        return '%s';
+        return $this->convertCase($arg)->toPascal();
     }
 }

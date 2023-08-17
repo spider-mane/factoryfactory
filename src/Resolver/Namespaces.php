@@ -16,7 +16,7 @@ class Namespaces extends AbstractClassResolver implements ClassResolverInterface
      */
     public function __construct(
         protected array $namespaces,
-        protected string $convention = '%s'
+        protected ?string $convention = null
     ) {
         //
     }
@@ -24,7 +24,7 @@ class Namespaces extends AbstractClassResolver implements ClassResolverInterface
     protected function performQuery(string $arg): string|false
     {
         foreach ($this->namespaces as $namespace) {
-            $class = $this->getFullyQualifiedName($namespace, $arg);
+            $class = $this->getArgAsQualifiedClass($namespace, $arg);
 
             if (class_exists($class)) {
                 return $class;
@@ -32,10 +32,5 @@ class Namespaces extends AbstractClassResolver implements ClassResolverInterface
         }
 
         return false;
-    }
-
-    protected function getClassConvention(): string
-    {
-        return $this->convention;
     }
 }

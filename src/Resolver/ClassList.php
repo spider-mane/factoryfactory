@@ -16,7 +16,7 @@ class ClassList extends AbstractClassResolver implements ClassResolverInterface
      */
     public function __construct(
         protected array $classes,
-        protected string $convention = '%s'
+        protected ?string $convention = null
     ) {
         //
     }
@@ -34,11 +34,6 @@ class ClassList extends AbstractClassResolver implements ClassResolverInterface
 
     protected function isMatchingClass(string $class, string $arg): bool
     {
-        return $this->getUnqualifiedName($class) === $this->getClassName($arg);
-    }
-
-    protected function getClassConvention(): string
-    {
-        return $this->convention;
+        return $this->getUqn($class) === $this->getArgAsClass($arg);
     }
 }
