@@ -3,11 +3,11 @@
 namespace Tests\Suites\Unit\Repository;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Tests\Support\Partials\HasExpectedTypes;
 use Tests\Support\UnitTestCase;
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
 use WebTheory\Factory\Interfaces\ClassResolverRepositoryInterface;
 use WebTheory\Factory\Repository\ClassResolverRepository;
+use WebTheory\UnitUtils\Partials\HasExpectedTypes;
 
 class ClassResolverRepositoryTest extends UnitTestCase
 {

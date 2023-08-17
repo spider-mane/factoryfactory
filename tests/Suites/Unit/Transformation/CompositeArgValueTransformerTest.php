@@ -4,10 +4,10 @@ namespace Tests\Suites\Unit\Transformation;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionParameter;
-use Tests\Support\Partials\HasExpectedTypes;
 use Tests\Support\UnitTestCase;
 use WebTheory\Factory\Interfaces\ArgValueTransformerInterface;
 use WebTheory\Factory\Transformation\CompositeArgValueTransformer;
+use WebTheory\UnitUtils\Partials\HasExpectedTypes;
 
 class CompositeArgValueTransformerTest extends UnitTestCase
 {

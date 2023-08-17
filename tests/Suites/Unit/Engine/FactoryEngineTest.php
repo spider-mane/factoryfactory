@@ -20,12 +20,12 @@ use Tests\Support\Fixtures\StubClassWithVariadicArraySetter;
 use Tests\Support\Fixtures\StubClassWithVariadicConstructor;
 use Tests\Support\Fixtures\StubClassWithVariadicSetter;
 use Tests\Support\Fixtures\StubClassWithWithers;
-use Tests\Support\Partials\HasExpectedTypes;
 use Tests\Support\UnitTestCase;
 use WebTheory\Factory\Engine\FactoryEngine;
 use WebTheory\Factory\Interfaces\ArgValueTransformerInterface;
 use WebTheory\Factory\Interfaces\ClassArgumentInterface;
 use WebTheory\Factory\Interfaces\FactoryEngineInterface;
+use WebTheory\UnitUtils\Partials\HasExpectedTypes;
 
 class FactoryEngineTest extends UnitTestCase
 {

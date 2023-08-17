@@ -3,11 +3,11 @@
 namespace Tests\Suites\Unit\Repository;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Tests\Support\Partials\HasExpectedTypes;
 use Tests\Support\UnitTestCase;
 use WebTheory\Factory\Interfaces\FlexFactoryInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryRepositoryInterface;
 use WebTheory\Factory\Repository\FlexFactoryRepository;
+use WebTheory\UnitUtils\Partials\HasExpectedTypes;
 
 class FlexFactoryRepositoryTest extends UnitTestCase
 {

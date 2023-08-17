@@ -7,12 +7,12 @@ namespace Tests\Support;
 use Jawira\CaseConverter\CaseConverter;
 use Jawira\CaseConverter\CaseConverterInterface;
 use PHPUnit\Framework\TestCase;
-use Tests\Support\Concerns\AssertionsTrait;
-use Tests\Support\Concerns\FakeGeneratorTrait;
-use Tests\Support\Concerns\FormattedDataSetsTrait;
-use Tests\Support\Concerns\MockeryTrait;
-use Tests\Support\Concerns\ProphecyTrait;
-use Tests\Support\Concerns\SystemTrait;
+use WebTheory\UnitUtils\Concerns\AssertionsTrait;
+use WebTheory\UnitUtils\Concerns\FakeGeneratorTrait;
+use WebTheory\UnitUtils\Concerns\FormattedDataSetsTrait;
+use WebTheory\UnitUtils\Concerns\MockeryTrait;
+use WebTheory\UnitUtils\Concerns\ProphecyTrait;
+use WebTheory\UnitUtils\Concerns\SystemTrait;
 
 abstract class BaseTestCase extends TestCase
 {

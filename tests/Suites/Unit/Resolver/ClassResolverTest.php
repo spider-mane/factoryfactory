@@ -11,10 +11,10 @@ use Tests\Support\Fixtures\Namespaces\DummyNamespace2\DummyClass6;
 use Tests\Support\Fixtures\Namespaces\DummyNamespace3\DummyClass7;
 use Tests\Support\Fixtures\Namespaces\DummyNamespace3\DummyClass8;
 use Tests\Support\Fixtures\Namespaces\DummyNamespace3\DummyClass9;
-use Tests\Support\Partials\HasExpectedTypes;
 use Tests\Support\UnitTestCase;
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
 use WebTheory\Factory\Resolver\ClassResolver;
+use WebTheory\UnitUtils\Partials\HasExpectedTypes;
 
 class ClassResolverTest extends UnitTestCase
 {

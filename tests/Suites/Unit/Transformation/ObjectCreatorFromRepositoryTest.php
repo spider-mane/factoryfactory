@@ -6,12 +6,12 @@ use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionParameter;
 use stdClass;
-use Tests\Support\Partials\HasExpectedTypes;
 use Tests\Support\UnitTestCase;
 use WebTheory\Factory\Interfaces\ArgValueTransformerInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryRepositoryInterface;
 use WebTheory\Factory\Transformation\ObjectCreatorFromRepository;
+use WebTheory\UnitUtils\Partials\HasExpectedTypes;
 
 class ObjectCreatorFromRepositoryTest extends UnitTestCase
 {

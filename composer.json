@@ -44,7 +44,8 @@
     "vlucas/phpdotenv": "^5.4",
     "webtheory/exterminate": "@dev",
     "webtheory/path-builder": "@dev",
-    "webtheory/playground": "@dev"
+    "webtheory/playground": "@dev",
+    "webtheory/unit-utils": "@dev"
   },
   "autoload": {
     "psr-4": {

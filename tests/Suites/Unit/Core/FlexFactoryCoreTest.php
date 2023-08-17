@@ -4,7 +4,6 @@ namespace Tests\Suites\Unit\Core;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Tests\Support\Fixtures\DummyClass;
-use Tests\Support\Partials\HasExpectedTypes;
 use Tests\Support\UnitTestCase;
 use WebTheory\Factory\Core\FlexFactoryCore;
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
@@ -12,6 +11,7 @@ use WebTheory\Factory\Interfaces\FactoryEngineInterface;
 use WebTheory\Factory\Interfaces\FixedFactoryInterface;
 use WebTheory\Factory\Interfaces\FixedFactoryRepositoryInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryCoreInterface;
+use WebTheory\UnitUtils\Partials\HasExpectedTypes;
 
 class FlexFactoryCoreTest extends UnitTestCase
 {

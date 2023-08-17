@@ -6,13 +6,13 @@ use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionParameter;
 use stdClass;
-use Tests\Support\Partials\HasExpectedTypes;
 use Tests\Support\UnitTestCase;
 use WebTheory\Factory\Interfaces\ArgValueTransformerInterface;
 use WebTheory\Factory\Interfaces\ClassArgumentInterface;
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
 use WebTheory\Factory\Interfaces\ClassResolverRepositoryInterface;
 use WebTheory\Factory\Transformation\ClassArgumentResolver;
+use WebTheory\UnitUtils\Partials\HasExpectedTypes;
 
 class ClassArgumentResolverTest extends UnitTestCase
 {
