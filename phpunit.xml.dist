@@ -28,20 +28,15 @@
     <testsuite name="integration">
       <directory>tests/Suites/Integration</directory>
     </testsuite>
-
-    <testsuite name="functional">
-      <directory>tests/Suites/Functional</directory>
-    </testsuite>
-
-    <testsuite name="acceptance">
-      <directory>tests/Suites/Acceptance</directory>
-    </testsuite>
   </testsuites>
 
   <coverage cacheDirectory="build/phpunit/coverage/.cache">
     <include>
       <directory suffix=".php">src</directory>
     </include>
+    <exclude>
+      <directory prefix="Empty" suffix="Repository.php">src</directory>
+    </exclude>
     <report>
       <html outputDirectory="build/phpunit/coverage/html"/>
       <clover outputFile="build/phpunit/coverage/coverage.clover.xml"/>
