@@ -3,8 +3,9 @@
 namespace WebTheory\Factory\Resolver;
 
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
+use WebTheory\Factory\Resolver\Abstracts\AbstractClassResolver;
 
-class CompositeClassResolver implements ClassResolverInterface
+class CompositeClassResolver extends AbstractClassResolver implements ClassResolverInterface
 {
     /**
      * @var list<ClassResolverInterface>
@@ -16,7 +17,7 @@ class CompositeClassResolver implements ClassResolverInterface
         $this->resolvers = $resolvers;
     }
 
-    public function getClass(string $arg): string|false
+    protected function performQuery(string $arg): string|false
     {
         foreach ($this->resolvers as $resolver) {
             if ($class = $resolver->getClass($arg)) {
