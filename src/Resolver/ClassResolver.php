@@ -11,12 +11,14 @@ class ClassResolver extends AbstractProxyClassResolver implements ClassResolverI
         array $map = [],
         array $classes = [],
         array $namespaces = [],
-        ?string $convention = null
+        ?string $convention = null,
+        ClassResolverInterface ...$extra
     ) {
         $this->handler = new CompositeClassResolver(
             new MappedClasses($map),
             new ClassList($classes, $convention),
-            new Namespaces($namespaces, $convention)
+            new Namespaces($namespaces, $convention),
+            ...$extra
         );
     }
 }

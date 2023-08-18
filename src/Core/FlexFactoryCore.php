@@ -13,11 +13,13 @@ class FlexFactoryCore extends AbstractProxyCore implements FlexFactoryCoreInterf
     public function __construct(
         ClassResolverInterface $resolver,
         FactoryEngineInterface $engine,
-        FixedFactoryRepositoryInterface $repository
+        FixedFactoryRepositoryInterface $repository,
+        FlexFactoryCoreInterface ...$extra
     ) {
         $this->handler = new CoreComposition(
             new CoreRepository($repository, $resolver),
-            new CoreEngine($engine, $resolver)
+            new CoreEngine($engine, $resolver),
+            ...$extra
         );
     }
 }
