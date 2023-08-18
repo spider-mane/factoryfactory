@@ -35,7 +35,8 @@
       <directory suffix=".php">src</directory>
     </include>
     <exclude>
-      <directory prefix="Empty" suffix="Repository.php">src</directory>
+      <directory prefix="Empty">src</directory>
+      <directory suffix="Callback.php">src</directory>
     </exclude>
     <report>
       <html outputDirectory="build/phpunit/coverage/html"/>
