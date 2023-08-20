@@ -8,54 +8,48 @@ use WebTheory\Factory\Interfaces\ArgValueTransformerInterface;
 use WebTheory\Factory\Interfaces\ClassArgumentInterface;
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
 use WebTheory\Factory\Interfaces\ClassResolverRepositoryInterface;
+use WebTheory\Factory\Interfaces\CreationArgumentPolicyInterface;
+use WebTheory\Factory\Transformation\Abstracts\AbstractClassArgumentTransformer;
 
-class ClassArgumentResolver implements ArgValueTransformerInterface
+class ClassArgumentResolver extends AbstractClassArgumentTransformer implements ArgValueTransformerInterface
 {
-    public const DEFAULT_CLASS_KEY = '@create';
-
     public function __construct(
         protected ClassResolverRepositoryInterface $repository,
-        protected string $classKey = self::DEFAULT_CLASS_KEY
+        protected CreationArgumentPolicyInterface $policy
     ) {
         //
     }
 
-    /**
-     * @return mixed|ClassArgumentInterface
-     */
-    public function transformArg(string $key, mixed $val, ReflectionParameter $param): mixed
+    protected function resolveObject(string $key, string $query, array $args, ReflectionParameter $param): ClassArgumentInterface
     {
-        return $this->isCreationData($val)
-            ? $this->getClassArgument($key, $val)
-            : $val;
-    }
+        $class = $this->getClass($this->getResolver($key), $query);
 
-    protected function isCreationData(mixed $arg): bool
-    {
-        return is_array($arg) && isset($arg[$this->classKey]);
-    }
-
-    protected function getClassArgument(string $key, mixed $args): ClassArgumentInterface
-    {
-        $create = $args[$this->classKey];
-
-        unset($args[$this->classKey]);
-
-        return new ClassArgument(
-            $this->getClass($this->getResolver($key), $create),
-            $args
-        );
+        return new ClassArgument($class, $args);
     }
 
     protected function getResolver(string $key): ClassResolverInterface
     {
         return $this->repository->getClassResolver($key)
-            ?: throw new InvalidArgumentException();
+            ?: throw $this->unresolvableKeyException($key);
     }
 
-    protected function getClass(ClassResolverInterface $resolver, string $arg): string
+    protected function getClass(ClassResolverInterface $resolver, string $query): string
     {
-        return $resolver->getClass($arg)
-            ?: throw new InvalidArgumentException();
+        return $resolver->getClass($query)
+            ?: throw $this->unresolvableClassArgument($query);
+    }
+
+    protected function unresolvableKeyException(string $key): InvalidArgumentException
+    {
+        return new InvalidArgumentException(
+            "Unable to redefine value for {$key}."
+        );
+    }
+
+    protected function unresolvableClassArgument(string $query): InvalidArgumentException
+    {
+        return new InvalidArgumentException(
+            "Argument {$query} could not be resolved as a class."
+        );
     }
 }

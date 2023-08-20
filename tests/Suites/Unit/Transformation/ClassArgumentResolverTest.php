@@ -6,15 +6,14 @@ use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionParameter;
 use stdClass;
-use Tests\Support\UnitTestCase;
-use WebTheory\Factory\Interfaces\ArgValueTransformerInterface;
+use Tests\Support\PolicyDeferredTransformerTestCase;
 use WebTheory\Factory\Interfaces\ClassArgumentInterface;
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
 use WebTheory\Factory\Interfaces\ClassResolverRepositoryInterface;
 use WebTheory\Factory\Transformation\ClassArgumentResolver;
 use WebTheory\UnitUtils\Partials\HasExpectedTypes;
 
-class ClassArgumentResolverTest extends UnitTestCase
+class ClassArgumentResolverTest extends PolicyDeferredTransformerTestCase
 {
     use HasExpectedTypes;
 
@@ -24,7 +23,7 @@ class ClassArgumentResolverTest extends UnitTestCase
 
     protected ClassArgumentResolver $sut;
 
-    protected string $classKey = ClassArgumentResolver::DEFAULT_CLASS_KEY;
+    protected string $classKey = '@create';
 
     /**
      * @var MockObject&ClassResolverRepositoryInterface
@@ -52,15 +51,8 @@ class ClassArgumentResolverTest extends UnitTestCase
 
         $this->sut = new ClassArgumentResolver(
             $this->repository = $mock(ClassResolverRepositoryInterface::class),
-            $this->classKey
+            $this->policy
         );
-    }
-
-    protected function defineExpectedTypesData(callable $ds): array
-    {
-        return [
-            $ds($i = ArgValueTransformerInterface::class) => [$i],
-        ];
     }
 
     /**
@@ -74,6 +66,8 @@ class ClassArgumentResolverTest extends UnitTestCase
         $initialArgs = [$this->classKey => $classArg] + $argsToPass;
         $class = stdClass::class;
 
+        $this->configurePolicy(true, $classArg, $argsToPass);
+
         $this->repository->method(static::REPOSITORY_QUERY_METHOD)
             ->with($key)
             ->willReturn($this->resolver);
@@ -82,6 +76,7 @@ class ClassArgumentResolverTest extends UnitTestCase
             ->with($classArg)
             ->willReturn($class);
 
+        /** @var ClassArgumentInterface */
         $result = $this->sut->transformArg($key, $initialArgs, $this->parameter);
 
         $this->assertInstanceOf(ClassArgumentInterface::class, $result);
@@ -91,31 +86,19 @@ class ClassArgumentResolverTest extends UnitTestCase
 
     /**
      * @test
-     * @dataProvider originalValueData
      */
-    public function it_returns_the_original_value_if_does_not_meet_specifications(mixed $value)
+    public function it_returns_the_original_value_if_does_not_meet_specifications()
     {
+        $value = $this->fake->address();
         $result = $this->sut->transformArg(
             $this->fake->word(),
             $value,
             $this->parameter
         );
 
+        $this->configurePolicy(false);
+
         $this->assertSame($value, $result);
-    }
-
-    public function originalValueData(): array
-    {
-        $this->init();
-
-        $ds = fn (string $condition) => $this->ds()
-            ->set('condition', $condition)
-            ->get();
-
-        return [
-            $ds('not an array') => [$this->fake->address()],
-            $ds('no creation key') => [$this->fakeAutoKeyedMap(10, 'address')],
-        ];
     }
 
     /**
@@ -123,6 +106,8 @@ class ClassArgumentResolverTest extends UnitTestCase
      */
     public function it_throws_an_exception_if_repository_cannot_resolve_resolver()
     {
+        $this->configurePolicy(true);
+
         $this->repository->method(static::REPOSITORY_QUERY_METHOD)
             ->willReturn(false);
 
@@ -140,6 +125,8 @@ class ClassArgumentResolverTest extends UnitTestCase
      */
     public function it_throws_an_exception_if_it_resolver_cannot_resolve_class()
     {
+        $this->configurePolicy(true);
+
         $this->repository->method(static::REPOSITORY_QUERY_METHOD)
             ->willReturn($this->resolver);
 

@@ -4,22 +4,20 @@ namespace Tests\Suites\Unit\Transformation;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
-use ReflectionParameter;
 use stdClass;
-use Tests\Support\UnitTestCase;
-use WebTheory\Factory\Interfaces\ArgValueTransformerInterface;
+use Tests\Support\PolicyDeferredTransformerTestCase;
 use WebTheory\Factory\Interfaces\FlexFactoryInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryRepositoryInterface;
 use WebTheory\Factory\Transformation\ObjectCreatorFromRepository;
 use WebTheory\UnitUtils\Partials\HasExpectedTypes;
 
-class ObjectCreatorFromRepositoryTest extends UnitTestCase
+class ObjectCreatorFromRepositoryTest extends PolicyDeferredTransformerTestCase
 {
     use HasExpectedTypes;
 
     protected ObjectCreatorFromRepository $sut;
 
-    protected string $classKey = ObjectCreatorFromRepository::DEFAULT_CLASS_KEY;
+    protected string $classKey = '@create';
 
     /**
      * @var MockObject&FlexFactoryRepositoryInterface
@@ -31,11 +29,6 @@ class ObjectCreatorFromRepositoryTest extends UnitTestCase
      */
     protected FlexFactoryInterface $factory;
 
-    /**
-     * @var MockObject&ReflectionParameter
-     */
-    protected ReflectionParameter $parameter;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -43,19 +36,11 @@ class ObjectCreatorFromRepositoryTest extends UnitTestCase
         $mock = [$this, 'createMock'];
 
         $this->factory = $mock(FlexFactoryInterface::class);
-        $this->parameter = $mock(ReflectionParameter::class);
 
         $this->sut = new ObjectCreatorFromRepository(
             $this->repository = $mock(FlexFactoryRepositoryInterface::class),
-            $this->classKey
+            $this->policy
         );
-    }
-
-    protected function defineExpectedTypesData(callable $ds): array
-    {
-        return [
-            $ds($i = ArgValueTransformerInterface::class) => [$i],
-        ];
     }
 
     /**
@@ -73,6 +58,8 @@ class ObjectCreatorFromRepositoryTest extends UnitTestCase
         $value = [$this->classKey => $create] + $args;
 
         $expected = new stdClass();
+
+        $this->configurePolicy(true, $create, $args);
 
         # Expect
         $this->repository->method('getTypeFactory')
@@ -97,6 +84,8 @@ class ObjectCreatorFromRepositoryTest extends UnitTestCase
     {
         $key = 'value_one';
         $value = [$this->classKey => $this->dummyArg()];
+
+        $this->configurePolicy(true);
 
         $this->repository->method('getTypeFactory')->willReturn(false);
 

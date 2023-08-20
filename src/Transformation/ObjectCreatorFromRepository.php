@@ -5,42 +5,25 @@ namespace WebTheory\Factory\Transformation;
 use InvalidArgumentException;
 use ReflectionParameter;
 use WebTheory\Factory\Interfaces\ArgValueTransformerInterface;
+use WebTheory\Factory\Interfaces\CreationArgumentPolicyInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryRepositoryInterface;
+use WebTheory\Factory\Transformation\Abstracts\AbstractObjectiveArgumentTransformer;
 
-class ObjectCreatorFromRepository implements ArgValueTransformerInterface
+class ObjectCreatorFromRepository extends AbstractObjectiveArgumentTransformer implements ArgValueTransformerInterface
 {
-    public const DEFAULT_CLASS_KEY = '@create';
-
     public function __construct(
         protected FlexFactoryRepositoryInterface $repository,
-        protected string $classKey = self::DEFAULT_CLASS_KEY
+        protected CreationArgumentPolicyInterface $policy
     ) {
-        $this->repository = $repository;
-        $this->classKey = $classKey;
+        //
     }
 
-    public function transformArg(string $key, mixed $val, ReflectionParameter $param): mixed
+    protected function resolveObject(string $key, string $query, array $args, ReflectionParameter $param): object
     {
-        return $this->isCreationData($val)
-            ? $this->createObjectFromArgs($key, $val)
-            : $val;
-    }
-
-    protected function isCreationData(mixed $arg): bool
-    {
-        return is_array($arg) && array_key_exists($this->classKey, $arg);
-    }
-
-    protected function createObjectFromArgs(string $key, array $args): object
-    {
-        $create = $args[$this->classKey];
-
-        unset($args[$this->classKey]);
-
         if ($factory = $this->repository->getTypeFactory($key)) {
-            return $factory->create($create, $args);
+            return $factory->create($query, $args);
         } else {
-            throw $this->unresolvableCreationArgException($key, $create);
+            throw $this->unresolvableCreationArgException($key, $query);
         }
     }
 
