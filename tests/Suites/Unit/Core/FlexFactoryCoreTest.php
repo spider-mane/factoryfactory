@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Suites\Unit\Core;
 
 use PHPUnit\Framework\MockObject\MockObject;
@@ -101,9 +103,13 @@ class FlexFactoryCoreTest extends UnitTestCase
         $class = DummyClass::class;
         $expected = new $class();
 
-        $this->repository->expects($this->exactly(2))
+        $repositoryReturns = fn ($val) => $val === $class
+            ? $this->factory
+            : false;
+
+        $this->repository->expects($this->atLeast(2))
             ->method(static::REPOSITORY_QUERY_METHOD)
-            ->willReturnOnConsecutiveCalls(false, $this->factory);
+            ->willReturnCallback($repositoryReturns);
 
         $this->classResolver->method(static::RESOLVER_QUERY_METHOD)
             ->with($query)

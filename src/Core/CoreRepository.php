@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WebTheory\Factory\Core;
 
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
@@ -18,26 +20,30 @@ class CoreRepository implements FlexFactoryCoreInterface
 
     public function process(string $query, array $args = []): object|false
     {
-        $resolved = $this->resolveFactory($query);
+        if (!$factory = $this->resolveFactory($query)) {
+            return false;
+        }
 
-        return $resolved ? $resolved->create($args) : $resolved;
+        return $factory->create($args);
     }
 
-    protected function resolveFactory(string $class): FixedFactoryInterface|false
+    protected function resolveFactory(string $query): FixedFactoryInterface|false
     {
-        return $this->queryRepository($class)
-            ?: $this->resolveAndQueryRepository($class);
+        return $this->queryRepository($query)
+            ?: $this->resolveAndQueryRepository($query);
     }
 
-    protected function queryRepository(string $class): FixedFactoryInterface|false
+    protected function queryRepository(string $query): FixedFactoryInterface|false
     {
-        return $this->repository->getClassFactory($class);
+        return $this->repository->getClassFactory($query);
     }
 
-    protected function resolveAndQueryRepository(string $class): FixedFactoryInterface|false
+    protected function resolveAndQueryRepository(string $query): FixedFactoryInterface|false
     {
-        $query = $this->resolver->getClass($class);
+        if (!$class = $this->resolver->getClass($query)) {
+            return false;
+        }
 
-        return $query ? $this->queryRepository($class) : $query;
+        return $this->queryRepository($class);
     }
 }

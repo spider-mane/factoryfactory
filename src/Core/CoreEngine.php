@@ -17,8 +17,10 @@ class CoreEngine implements FlexFactoryCoreInterface
 
     public function process(string $query, array $args = []): object|false
     {
-        $result = $this->resolver->getClass($query);
+        if (!$class = $this->resolver->getClass($query)) {
+            return false;
+        }
 
-        return $result ? $this->engine->generate($result, $args) : $result;
+        return $this->engine->generate($class, $args);
     }
 }
