@@ -2,15 +2,18 @@
 
 namespace WebTheory\Factory\Transformation;
 
-use InvalidArgumentException;
 use ReflectionParameter;
+use WebTheory\Factory\Abstracts\ResolutionEndpointTrait;
 use WebTheory\Factory\Interfaces\ArgValueTransformerInterface;
 use WebTheory\Factory\Interfaces\CreationArgumentPolicyInterface;
+use WebTheory\Factory\Interfaces\FlexFactoryInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryRepositoryInterface;
 use WebTheory\Factory\Transformation\Abstracts\AbstractObjectiveArgumentTransformer;
 
 class ObjectCreatorFromRepository extends AbstractObjectiveArgumentTransformer implements ArgValueTransformerInterface
 {
+    use ResolutionEndpointTrait;
+
     public function __construct(
         protected FlexFactoryRepositoryInterface $repository,
         protected CreationArgumentPolicyInterface $policy
@@ -18,19 +21,14 @@ class ObjectCreatorFromRepository extends AbstractObjectiveArgumentTransformer i
         //
     }
 
-    protected function resolveObject(string $key, string $query, array $args, ReflectionParameter $param): object
+    protected function resolveObject(string $item, string $query, array $args, ReflectionParameter $param): object
     {
-        if ($factory = $this->repository->getTypeFactory($key)) {
-            return $factory->create($query, $args);
-        }
-
-        throw $this->unresolvableCreationArgException($key, $query);
+        return $this->getFactory($item)->create($query, $args);
     }
 
-    protected function unresolvableCreationArgException(string $key, string $arg): InvalidArgumentException
+    protected function getFactory(string $item): FlexFactoryInterface
     {
-        return new InvalidArgumentException(
-            "Unable to create instance of {$arg} for argument {$key}."
-        );
+        return $this->repository->getTypeFactory($item)
+            ?: throw $this->unresolvableItemException($item);
     }
 }

@@ -2,15 +2,15 @@
 
 namespace WebTheory\Factory\Factory;
 
+use WebTheory\Factory\Abstracts\ResolutionEndpointTrait;
 use WebTheory\Factory\Interfaces\ClassArgumentGeneratorInterface;
 use WebTheory\Factory\Interfaces\ClassArgumentInterface;
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
-use WebTheory\Factory\Resolver\Abstracts\DependencyResolverTrait;
 use WebTheory\Factory\Transformation\ClassArgument;
 
 class ClassArgumentGenerator implements ClassArgumentGeneratorInterface
 {
-    use DependencyResolverTrait;
+    use ResolutionEndpointTrait;
 
     public function __construct(protected ClassResolverInterface $classResolver)
     {

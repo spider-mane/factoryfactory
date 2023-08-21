@@ -1,12 +1,12 @@
 <?php
 
-namespace WebTheory\Factory\Resolver\Abstracts;
+namespace WebTheory\Factory\Abstracts;
 
 use InvalidArgumentException;
 
-trait DependencyResolverTrait
+trait ResolutionEndpointTrait
 {
-    protected function unresolvableClassException(string $class): InvalidArgumentException
+    protected function unresolvableSubjectException(string $class): InvalidArgumentException
     {
         return new InvalidArgumentException(
             "Unable to resolve arguments on class \"{$class}.\""

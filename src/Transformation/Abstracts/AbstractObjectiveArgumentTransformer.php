@@ -21,5 +21,5 @@ abstract class AbstractObjectiveArgumentTransformer
         return $this->resolveObject($key, $query, $args, $param);
     }
 
-    abstract protected function resolveObject(string $key, string $query, array $args, ReflectionParameter $param): object;
+    abstract protected function resolveObject(string $item, string $query, array $args, ReflectionParameter $param): object;
 }

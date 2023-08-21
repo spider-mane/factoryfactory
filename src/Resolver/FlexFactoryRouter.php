@@ -2,14 +2,14 @@
 
 namespace WebTheory\Factory\Resolver;
 
+use WebTheory\Factory\Abstracts\ResolutionEndpointTrait;
 use WebTheory\Factory\Interfaces\DependencyResolverInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryRepositoryInterface;
-use WebTheory\Factory\Resolver\Abstracts\DependencyResolverTrait;
 
 class FlexFactoryRouter implements DependencyResolverInterface
 {
-    use DependencyResolverTrait;
+    use ResolutionEndpointTrait;
 
     public function __construct(protected FlexFactoryRepositoryInterface $repository)
     {

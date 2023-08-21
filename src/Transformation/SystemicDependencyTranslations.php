@@ -17,10 +17,15 @@ class SystemicDependencyTranslations extends AbstractObjectiveArgumentTransforme
         //
     }
 
-    protected function resolveObject(string $key, string $query, array $args, ReflectionParameter $param): object
+    protected function resolveObject(string $item, string $query, array $args, ReflectionParameter $param): object
     {
-        $for = $param->getDeclaringClass()->getName();
+        $for = $this->getSubject($param);
 
-        return $this->resolver->resolve($for, $key, $query, $args);
+        return $this->resolver->resolve($for, $item, $query, $args);
+    }
+
+    protected function getSubject(ReflectionParameter $param): string
+    {
+        return $param->getDeclaringClass()->getName();
     }
 }

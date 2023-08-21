@@ -2,37 +2,38 @@
 
 namespace WebTheory\Factory\Resolver;
 
+use ArrayAccess;
+use WebTheory\Factory\Abstracts\ResolutionEndpointTrait;
 use WebTheory\Factory\Interfaces\FlexFactoryInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryRepositoryInterface;
 use WebTheory\Factory\Interfaces\UniversalDependencyResolverInterface;
-use WebTheory\Factory\Resolver\Abstracts\DependencyResolverTrait;
 
 class FlexFactoryTree implements UniversalDependencyResolverInterface
 {
-    use DependencyResolverTrait;
+    use ResolutionEndpointTrait;
 
     /**
      * @param array<class-string, FlexFactoryRepositoryInterface> $tree
      */
-    public function __construct(protected array $tree)
+    public function __construct(protected array|ArrayAccess $tree)
     {
         //
     }
 
     public function resolve(string $for, string $item, string $query, array $args): object
     {
-        return $this->getNode($for, $item)->create($query, $args);
+        return $this->getFactory($for, $item)->create($query, $args);
     }
 
-    protected function getNode(string $class, string $item): FlexFactoryInterface
+    protected function getFactory(string $class, string $item): FlexFactoryInterface
     {
-        return $this->getBranch($class)->getTypeFactory($item)
+        return $this->getRepository($class)->getTypeFactory($item)
             ?: throw $this->unresolvableItemException($item);
     }
 
-    protected function getBranch(string $class): FlexFactoryRepositoryInterface
+    protected function getRepository(string $class): FlexFactoryRepositoryInterface
     {
         return $this->tree[$class]
-            ?? throw $this->unresolvableClassException($class);
+            ?? throw $this->unresolvableSubjectException($class);
     }
 }
