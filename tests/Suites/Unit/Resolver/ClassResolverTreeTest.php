@@ -2,12 +2,14 @@
 
 namespace Tests\Suites\Unit\Resolver;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use stdClass;
 use Tests\Support\Fixtures\DummyClass;
 use Tests\Support\Fixtures\Namespaces\DummyNamespace1\DummyClass1;
 use Tests\Support\UnitTestCase;
+use WebTheory\Factory\Exception\UnresolvableItemException;
+use WebTheory\Factory\Exception\UnresolvableQueryException;
+use WebTheory\Factory\Exception\UnresolvableSubjectException;
 use WebTheory\Factory\Interfaces\ClassArgumentInterface;
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
 use WebTheory\Factory\Interfaces\ClassResolverRepositoryInterface;
@@ -90,7 +92,7 @@ class ClassResolverTreeTest extends UnitTestCase
      */
     public function it_throws_an_exception_if_class_argument_is_not_mapped_to_a_repository()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(UnresolvableSubjectException::class);
 
         $this->sut->resolve(
             stdClass::class,
@@ -108,7 +110,7 @@ class ClassResolverTreeTest extends UnitTestCase
         $this->repository->method(static::REPOSITORY_GET_RESOLVER_METHOD)
             ->willReturn(false);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(UnresolvableItemException::class);
 
         $this->sut->resolve(
             $this->classFor,
@@ -129,7 +131,7 @@ class ClassResolverTreeTest extends UnitTestCase
         $this->resolver->method(static::RESOLVER_RESOLUTION_METHOD)
             ->willReturn(false);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(UnresolvableQueryException::class);
 
         $this->sut->resolve(
             $this->classFor,

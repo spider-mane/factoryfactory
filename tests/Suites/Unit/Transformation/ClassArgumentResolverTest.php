@@ -2,11 +2,12 @@
 
 namespace Tests\Suites\Unit\Transformation;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionParameter;
 use stdClass;
 use Tests\Support\Bases\PolicyDeferredTransformerTestCase;
+use WebTheory\Factory\Exception\UnresolvableItemException;
+use WebTheory\Factory\Exception\UnresolvableQueryException;
 use WebTheory\Factory\Interfaces\ClassArgumentInterface;
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
 use WebTheory\Factory\Interfaces\ClassResolverRepositoryInterface;
@@ -94,7 +95,7 @@ class ClassArgumentResolverTest extends PolicyDeferredTransformerTestCase
         $this->repository->method(static::REPOSITORY_QUERY_METHOD)
             ->willReturn(false);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(UnresolvableItemException::class);
 
         $this->sut->transformArg(
             $this->fake->slug(),
@@ -116,7 +117,7 @@ class ClassArgumentResolverTest extends PolicyDeferredTransformerTestCase
         $this->resolver->method(static::RESOLVER_QUERY_METHOD)
             ->willReturn(false);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(UnresolvableQueryException::class);
 
         $this->sut->transformArg(
             $this->fake->slug(),

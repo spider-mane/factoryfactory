@@ -2,28 +2,27 @@
 
 namespace WebTheory\Factory\Abstracts;
 
-use InvalidArgumentException;
+use WebTheory\Factory\Exception\UnresolvableItemException;
+use WebTheory\Factory\Exception\UnresolvableQueryException;
+use WebTheory\Factory\Exception\UnresolvableSubjectException;
 
 trait ResolutionEndpointTrait
 {
-    protected function unresolvableSubjectException(string $class): InvalidArgumentException
+    /**
+     * @param class-string $class
+     */
+    protected function unresolvableSubjectException(string $class): UnresolvableSubjectException
     {
-        return new InvalidArgumentException(
-            "Unable to resolve arguments on class \"{$class}.\""
-        );
+        return new UnresolvableSubjectException($class);
     }
 
-    protected function unresolvableItemException(string $item): InvalidArgumentException
+    protected function unresolvableItemException(string $item): UnresolvableItemException
     {
-        return new InvalidArgumentException(
-            "Unable to resolve for item \"{$item}.\"."
-        );
+        return new UnresolvableItemException($item);
     }
 
-    protected function unresolvableQueryException(string $query): InvalidArgumentException
+    protected function unresolvableQueryException(string $query): UnresolvableQueryException
     {
-        return new InvalidArgumentException(
-            "Unable to resolve argument \"{$query}.\""
-        );
+        return new UnresolvableQueryException($query);
     }
 }

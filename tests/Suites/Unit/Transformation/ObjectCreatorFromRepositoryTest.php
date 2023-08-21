@@ -2,10 +2,10 @@
 
 namespace Tests\Suites\Unit\Transformation;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use stdClass;
 use Tests\Support\Bases\PolicyDeferredTransformerTestCase;
+use WebTheory\Factory\Exception\UnresolvableItemException;
 use WebTheory\Factory\Interfaces\FlexFactoryInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryRepositoryInterface;
 use WebTheory\Factory\Transformation\ObjectCreatorFromRepository;
@@ -90,7 +90,7 @@ class ObjectCreatorFromRepositoryTest extends PolicyDeferredTransformerTestCase
         $this->repository->method('getTypeFactory')->willReturn(false);
 
         # Expect
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(UnresolvableItemException::class);
 
         # Act
         $this->sut->transformArg($key, $value, $this->parameter);

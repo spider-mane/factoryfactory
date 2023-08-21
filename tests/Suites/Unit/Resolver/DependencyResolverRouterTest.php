@@ -2,11 +2,11 @@
 
 namespace Tests\Suites\Unit\Resolver;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use stdClass;
 use Tests\Support\Fixtures\DummyClass;
 use Tests\Support\UnitTestCase;
+use WebTheory\Factory\Exception\UnresolvableSubjectException;
 use WebTheory\Factory\Interfaces\DependencyResolverInterface;
 use WebTheory\Factory\Interfaces\UniversalDependencyResolverInterface;
 use WebTheory\Factory\Resolver\DependencyResolverRouter;
@@ -83,7 +83,7 @@ class DependencyResolverRouterTest extends UnitTestCase
      */
     public function it_throws_an_exception_if_class_is_not_mapped_to_a_resolver()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(UnresolvableSubjectException::class);
 
         $this->sut->resolve(stdClass::class, $this->item, $this->query, []);
     }

@@ -2,10 +2,10 @@
 
 namespace Tests\Suites\Unit\Factory;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use Tests\Support\Fixtures\DummyClass;
 use Tests\Support\UnitTestCase;
+use WebTheory\Factory\Exception\UnresolvableQueryException;
 use WebTheory\Factory\Factory\ClassArgumentGenerator;
 use WebTheory\Factory\Interfaces\ClassArgumentGeneratorInterface;
 use WebTheory\Factory\Interfaces\ClassArgumentInterface;
@@ -70,7 +70,7 @@ class ClassArgumentGeneratorFactoryTest extends UnitTestCase
         $this->resolver->method(static::RESOLVER_RESOLUTION_METHOD)
             ->willReturn(false);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(UnresolvableQueryException::class);
 
         $this->sut->create($this->dummyArg(), []);
     }

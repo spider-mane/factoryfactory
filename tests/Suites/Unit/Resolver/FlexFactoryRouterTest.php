@@ -2,10 +2,10 @@
 
 namespace Tests\Suites\Unit\Resolver;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use Tests\Support\Fixtures\DummyClass;
 use Tests\Support\UnitTestCase;
+use WebTheory\Factory\Exception\UnresolvableItemException;
 use WebTheory\Factory\Interfaces\DependencyResolverInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryRepositoryInterface;
@@ -92,7 +92,7 @@ class FlexFactoryRouterTest extends UnitTestCase
      */
     public function it_throws_an_exception_if_item_is_not_mapped_to_a_factory()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(UnresolvableItemException::class);
 
         $this->sut->resolve('invalid_item', $this->query, []);
     }
