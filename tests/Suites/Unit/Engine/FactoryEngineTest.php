@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Suites\Unit\Engine;
 
-use InvalidArgumentException;
-use LogicException;
 use PHPUnit\Framework\Constraint\IsInstanceOf;
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionParameter;
@@ -22,6 +20,8 @@ use Tests\Support\Fixtures\StubClassWithVariadicSetter;
 use Tests\Support\Fixtures\StubClassWithWithers;
 use Tests\Support\UnitTestCase;
 use WebTheory\Factory\Engine\FactoryEngine;
+use WebTheory\Factory\Exception\UnresolvableConstructorArgumentException;
+use WebTheory\Factory\Exception\UnresolvableSetterException;
 use WebTheory\Factory\Interfaces\ArgValueTransformerInterface;
 use WebTheory\Factory\Interfaces\ClassArgumentInterface;
 use WebTheory\Factory\Interfaces\FactoryEngineInterface;
@@ -180,7 +180,7 @@ class FactoryEngineTest extends UnitTestCase
      */
     public function it_throws_an_exception_if_it_cannot_set_a_property()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(UnresolvableSetterException::class);
 
         $this->sut->generate(DummyClass::class, [
             'unresolvable_arg' => $this->fake->sentence(),
@@ -298,7 +298,7 @@ class FactoryEngineTest extends UnitTestCase
     {
         $class = StubClassWithoutSetters::class;
 
-        $this->expectException(LogicException::class);
+        $this->expectException(UnresolvableConstructorArgumentException::class);
 
         $this->sut->generate($class, []);
     }

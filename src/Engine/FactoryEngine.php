@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace WebTheory\Factory\Engine;
 
-use InvalidArgumentException;
-use LogicException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use ReflectionParameter;
+use WebTheory\Factory\Exception\UnresolvableConstructorArgumentException;
+use WebTheory\Factory\Exception\UnresolvableSetterException;
 use WebTheory\Factory\Interfaces\ArgumentResolverInterface;
 use WebTheory\Factory\Interfaces\ArgValueTransformerInterface;
 use WebTheory\Factory\Interfaces\ClassArgumentInterface;
@@ -61,8 +61,9 @@ class FactoryEngine implements FactoryEngineInterface
         $extracted = [];
 
         foreach ($constructor->getParameters() as $param) {
-            if (in_array($name = $param->getName(), $keys)) {
-                $arg = $this->convertParamToArg($name);
+            $arg = $this->convertParamToArg($name = $param->getName());
+
+            if (in_array($name, $keys)) {
                 $extracted[] = $this->parseArg($arg, $args[$arg], $param);
 
                 unset($args[$arg]);
@@ -70,7 +71,7 @@ class FactoryEngine implements FactoryEngineInterface
                 try {
                     $extracted[] = $param->getDefaultValue();
                 } catch (ReflectionException $e) {
-                    throw new LogicException($e->getMessage());
+                    throw $this->unresolvableConstructorArgumentException($arg);
                 }
             }
         }
@@ -104,6 +105,11 @@ class FactoryEngine implements FactoryEngineInterface
         return $value instanceof ClassArgumentInterface
             ? $this->generate($value->getClass(), $value->getArgs())
             : $value;
+    }
+
+    protected function unresolvableConstructorArgumentException(string $arg): UnresolvableConstructorArgumentException
+    {
+        return new UnresolvableConstructorArgumentException($arg);
     }
 
     protected function isVariadicArgument(ReflectionMethod $method, mixed $arg): bool
@@ -157,10 +163,8 @@ class FactoryEngine implements FactoryEngineInterface
         }
     }
 
-    protected function unresolvableArgException(ReflectionClass $class, string $property): InvalidArgumentException
+    protected function unresolvableArgException(ReflectionClass $class, string $property): UnresolvableSetterException
     {
-        return new InvalidArgumentException(
-            "Could not resolve method to set {$property} on {$class->name}."
-        );
+        return new UnresolvableSetterException($class->getName(), $property);
     }
 }
