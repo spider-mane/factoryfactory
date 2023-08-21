@@ -35,6 +35,7 @@
   <!-- Disable camel case method name rule for tests -->
   <rule ref="PSR1.Methods.CamelCapsMethodName">
     <exclude-pattern>./tests/Suites</exclude-pattern>
+    <exclude-pattern>./tests/Support/Bases</exclude-pattern>
     <exclude-pattern>./tests/Support/Partials</exclude-pattern>
   </rule>
 </ruleset>

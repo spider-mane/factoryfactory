@@ -9,9 +9,9 @@ use WebTheory\Factory\Interfaces\ClassArgumentInterface;
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
 use WebTheory\Factory\Interfaces\ClassResolverRepositoryInterface;
 use WebTheory\Factory\Interfaces\CreationArgumentPolicyInterface;
-use WebTheory\Factory\Transformation\Abstracts\AbstractClassArgumentTransformer;
+use WebTheory\Factory\Transformation\Abstracts\AbstractObjectiveArgumentTransformer;
 
-class ClassArgumentResolver extends AbstractClassArgumentTransformer implements ArgValueTransformerInterface
+class ClassArgumentResolver extends AbstractObjectiveArgumentTransformer implements ArgValueTransformerInterface
 {
     public function __construct(
         protected ClassResolverRepositoryInterface $repository,
@@ -27,26 +27,26 @@ class ClassArgumentResolver extends AbstractClassArgumentTransformer implements 
         return new ClassArgument($class, $args);
     }
 
-    protected function getResolver(string $key): ClassResolverInterface
+    protected function getResolver(string $item): ClassResolverInterface
     {
-        return $this->repository->getClassResolver($key)
-            ?: throw $this->unresolvableKeyException($key);
+        return $this->repository->getClassResolver($item)
+            ?: throw $this->unresolvableResolverException($item);
+    }
+
+    protected function unresolvableResolverException(string $item): InvalidArgumentException
+    {
+        return new InvalidArgumentException(
+            "Unable to redefine value for {$item}."
+        );
     }
 
     protected function getClass(ClassResolverInterface $resolver, string $query): string
     {
         return $resolver->getClass($query)
-            ?: throw $this->unresolvableClassArgument($query);
+            ?: throw $this->unresolvableClassException($query);
     }
 
-    protected function unresolvableKeyException(string $key): InvalidArgumentException
-    {
-        return new InvalidArgumentException(
-            "Unable to redefine value for {$key}."
-        );
-    }
-
-    protected function unresolvableClassArgument(string $query): InvalidArgumentException
+    protected function unresolvableClassException(string $query): InvalidArgumentException
     {
         return new InvalidArgumentException(
             "Argument {$query} could not be resolved as a class."

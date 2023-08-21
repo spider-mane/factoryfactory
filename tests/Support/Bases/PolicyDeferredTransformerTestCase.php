@@ -1,9 +1,10 @@
 <?php
 
-namespace Tests\Support;
+namespace Tests\Support\Bases;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionParameter;
+use Tests\Support\UnitTestCase;
 use WebTheory\Factory\Interfaces\ArgValueTransformerInterface;
 use WebTheory\Factory\Interfaces\CreationArgumentPolicyInterface;
 use WebTheory\UnitUtils\Partials\HasExpectedTypes;
@@ -53,5 +54,23 @@ abstract class PolicyDeferredTransformerTestCase extends UnitTestCase
         return [
             $ds($i = ArgValueTransformerInterface::class) => [$i],
         ];
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_the_original_value_if_does_not_meet_specifications()
+    {
+        $value = $this->fake->address();
+
+        $result = $this->getSut()->transformArg(
+            $this->fake->word(),
+            $value,
+            $this->parameter
+        );
+
+        $this->configurePolicy(false);
+
+        $this->assertSame($value, $result);
     }
 }

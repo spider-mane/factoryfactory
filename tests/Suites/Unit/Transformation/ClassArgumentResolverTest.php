@@ -6,7 +6,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionParameter;
 use stdClass;
-use Tests\Support\PolicyDeferredTransformerTestCase;
+use Tests\Support\Bases\PolicyDeferredTransformerTestCase;
 use WebTheory\Factory\Interfaces\ClassArgumentInterface;
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
 use WebTheory\Factory\Interfaces\ClassResolverRepositoryInterface;
@@ -82,23 +82,6 @@ class ClassArgumentResolverTest extends PolicyDeferredTransformerTestCase
         $this->assertInstanceOf(ClassArgumentInterface::class, $result);
         $this->assertSame($class, $result->getClass());
         $this->assertSame($argsToPass, $result->getArgs());
-    }
-
-    /**
-     * @test
-     */
-    public function it_returns_the_original_value_if_does_not_meet_specifications()
-    {
-        $value = $this->fake->address();
-        $result = $this->sut->transformArg(
-            $this->fake->word(),
-            $value,
-            $this->parameter
-        );
-
-        $this->configurePolicy(false);
-
-        $this->assertSame($value, $result);
     }
 
     /**

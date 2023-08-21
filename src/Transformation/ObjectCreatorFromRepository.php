@@ -22,9 +22,9 @@ class ObjectCreatorFromRepository extends AbstractObjectiveArgumentTransformer i
     {
         if ($factory = $this->repository->getTypeFactory($key)) {
             return $factory->create($query, $args);
-        } else {
-            throw $this->unresolvableCreationArgException($key, $query);
         }
+
+        throw $this->unresolvableCreationArgException($key, $query);
     }
 
     protected function unresolvableCreationArgException(string $key, string $arg): InvalidArgumentException

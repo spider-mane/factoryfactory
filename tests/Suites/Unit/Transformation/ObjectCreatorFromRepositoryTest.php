@@ -5,7 +5,7 @@ namespace Tests\Suites\Unit\Transformation;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use stdClass;
-use Tests\Support\PolicyDeferredTransformerTestCase;
+use Tests\Support\Bases\PolicyDeferredTransformerTestCase;
 use WebTheory\Factory\Interfaces\FlexFactoryInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryRepositoryInterface;
 use WebTheory\Factory\Transformation\ObjectCreatorFromRepository;
