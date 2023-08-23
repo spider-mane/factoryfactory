@@ -7,6 +7,7 @@ namespace WebTheory\Factory\Engine;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+use ReflectionNamedType;
 use ReflectionParameter;
 use WebTheory\Factory\Exception\UnresolvableConstructorArgumentException;
 use WebTheory\Factory\Exception\UnresolvableSetterException;
@@ -120,8 +121,7 @@ class FactoryEngine implements FactoryEngineInterface
 
         $params = $method->getParameters();
 
-        // @phpstan-ignore-next-line
-        if ('array' === end($params)->getType()?->getName()) {
+        if ('array' === $this->getParameterType(end($params))) {
             foreach ($arg as $entry) {
                 if (!is_array($entry)) {
                     return false;
@@ -130,6 +130,13 @@ class FactoryEngine implements FactoryEngineInterface
         }
 
         return true;
+    }
+
+    protected function getParameterType(ReflectionParameter $param): mixed
+    {
+        $type = $param->getType();
+
+        return $type instanceof ReflectionNamedType ? $type->getName() : $type;
     }
 
     protected function refineInstance(ReflectionClass $class, object $instance, array &$args): object
