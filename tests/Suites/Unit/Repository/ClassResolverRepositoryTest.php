@@ -2,6 +2,7 @@
 
 namespace Tests\Suites\Unit\Repository;
 
+use ArrayObject;
 use PHPUnit\Framework\MockObject\MockObject;
 use Tests\Support\UnitTestCase;
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
@@ -57,5 +58,17 @@ class ClassResolverRepositoryTest extends UnitTestCase
     public function it_returns_false_if_it_does_not_have_mapped_resolver()
     {
         $this->assertFalse($this->sut->getClassResolver('invalid_resolver'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_accepts_array_accessible_object_as_constructor_argument()
+    {
+        $accessible = new ArrayObject([]);
+
+        $result = new ClassResolverRepository($accessible);
+
+        $this->assertInstanceOf(ClassResolverRepository::class, $result);
     }
 }
