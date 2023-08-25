@@ -34,10 +34,12 @@
     <include>
       <directory suffix=".php">src</directory>
     </include>
+
     <exclude>
       <directory prefix="Empty">src</directory>
       <directory suffix="Callback.php">src</directory>
     </exclude>
+
     <report>
       <html outputDirectory="build/phpunit/coverage/html"/>
       <clover outputFile="build/phpunit/coverage/coverage.clover.xml"/>
@@ -53,5 +55,4 @@
     <testdoxXml outputFile="build/phpunit/logs/testdox.xml"/>
     <text outputFile="build/phpunit/logs/logfile.txt"/>
   </logging>
-
 </phpunit>
