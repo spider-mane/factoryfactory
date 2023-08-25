@@ -11,6 +11,8 @@ interface UniversalDependencyResolverInterface
      * @param array $args Arguments for building the queried class
      *
      * @return object
+     *
+     * @throws ArgTransformationExceptionInterface
      */
     public function resolve(string $for, string $item, string $query, array $args): object;
 }

@@ -56,4 +56,13 @@ abstract class BaseTestCase extends TestCase
         return $this->caseConverter->convert($this->fake->words(3, true))
             ->toSnake();
     }
+
+    protected function dummyArgs(int $count = 5): array
+    {
+        return $this->dummyAutoKeyedMap(
+            [$this, 'dummyArg'],
+            [$this, 'dummyArg'],
+            $count
+        );
+    }
 }

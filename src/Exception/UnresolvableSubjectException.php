@@ -4,8 +4,9 @@ namespace WebTheory\Factory\Exception;
 
 use InvalidArgumentException;
 use Throwable;
+use WebTheory\Factory\Interfaces\ArgTransformationExceptionInterface;
 
-class UnresolvableSubjectException extends InvalidArgumentException
+class UnresolvableSubjectException extends InvalidArgumentException implements ArgTransformationExceptionInterface
 {
     protected string $template = "Unable to resolve arguments on class \"%s.\"";
 
