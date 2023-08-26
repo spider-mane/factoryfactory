@@ -27,7 +27,7 @@ class DependencyResolverRouterTest extends UnitTestCase
 
     protected string $class = DummyClass::class;
 
-    protected string $item;
+    protected string $entry;
 
     protected string $query;
 
@@ -41,7 +41,7 @@ class DependencyResolverRouterTest extends UnitTestCase
 
         $this->resolver = $mock(DependencyResolverInterface::class);
 
-        $this->item = $this->dummyArg();
+        $this->entry = $this->dummyArg();
         $this->query = $this->dummyArg();
         $this->args = $this->fakeAutoKeyedMap(5, 'sentence');
 
@@ -63,17 +63,17 @@ class DependencyResolverRouterTest extends UnitTestCase
     public function it_returns_a_object_created_nested_resolver()
     {
         $class = $this->class;
-        $item = $this->item;
+        $entry = $this->entry;
         $query = $this->query;
         $args = $this->fakeAutoKeyedMap(5, 'sentence');
         $expected = new DummyClass();
 
         $this->resolver->expects($this->once())
             ->method(static::RESOLVER_RESOLUTION_METHOD)
-            ->with($item)
+            ->with($entry)
             ->willReturn($expected);
 
-        $result = $this->sut->resolve($class, $item, $query, $args);
+        $result = $this->sut->resolve($class, $entry, $query, $args);
 
         $this->assertSame($expected, $result);
     }
@@ -85,6 +85,6 @@ class DependencyResolverRouterTest extends UnitTestCase
     {
         $this->expectException(UnresolvableSubjectException::class);
 
-        $this->sut->resolve(stdClass::class, $this->item, $this->query, []);
+        $this->sut->resolve(stdClass::class, $this->entry, $this->query, []);
     }
 }

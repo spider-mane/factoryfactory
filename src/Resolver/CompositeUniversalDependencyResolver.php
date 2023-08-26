@@ -19,7 +19,7 @@ class CompositeUniversalDependencyResolver implements UniversalDependencyResolve
         $this->resolvers = $resolvers;
     }
 
-    public function resolve(string $for, string $item, string $query, array $args): object
+    public function resolve(string $subject, string $entry, string $query, array $args): object
     {
         return $this->resolveFromComposition(
             $this->resolvers,

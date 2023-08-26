@@ -54,7 +54,7 @@ class ClassEntryObjectResolverTest extends UnitTestCase
     {
         # Arrange
         $param = $this->reflectionParameter;
-        $item = $this->dummyArg();
+        $entry = $this->dummyArg();
         $query = $this->dummyArg();
         $args = $this->fakeMap(
             ['prop1', 'prop2', 'prop3'],
@@ -66,11 +66,11 @@ class ClassEntryObjectResolverTest extends UnitTestCase
         # Expect
         $this->resolver->expects($this->once())
             ->method(static::RESOLVER_RESOLUTION_METHOD)
-            ->with($item, $query, $args)
+            ->with($entry, $query, $args)
             ->willReturn($expected);
 
         # Act
-        $result = $this->sut->resolveObject($item, $query, $args, $param);
+        $result = $this->sut->resolveObject($entry, $query, $args, $param);
 
         # Assert
         $this->assertSame($expected, $result);

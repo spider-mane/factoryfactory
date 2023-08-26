@@ -35,10 +35,10 @@ class ObjectiveArgumentTransformerTest extends PolicyDeferredTransformerTestCase
     public function it_returns_object_created_by_resolver()
     {
         $param = $this->parameter;
-        $item = $this->fake->word();
+        $entry = $this->fake->word();
         $query = $this->fake->word();
         $normalizedArgs = $this->fakeAutoKeyedMap(7, 'sentence');
-        $initialArgs = [$item => $query] + $normalizedArgs;
+        $initialArgs = [$entry => $query] + $normalizedArgs;
         $expected = new DummyClass();
 
         $this->configurePolicy(true, $query, $normalizedArgs);
@@ -46,11 +46,11 @@ class ObjectiveArgumentTransformerTest extends PolicyDeferredTransformerTestCase
         # Expect
         $this->resolver->expects($this->once())
             ->method(static::RESOLVER_RESOLUTION_METHOD)
-            ->with($item, $query, $normalizedArgs, $param)
+            ->with($entry, $query, $normalizedArgs, $param)
             ->willReturn($expected);
 
         # Act
-        $result = $this->sut->transformArg($item, $initialArgs, $param);
+        $result = $this->sut->transformArg($entry, $initialArgs, $param);
 
         # Assert
         $this->assertSame($expected, $result);

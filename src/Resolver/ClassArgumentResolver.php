@@ -2,7 +2,7 @@
 
 namespace WebTheory\Factory\Resolver;
 
-use WebTheory\Factory\Exception\UnresolvableItemException;
+use WebTheory\Factory\Exception\UnresolvableEntryException;
 use WebTheory\Factory\Exception\UnresolvableQueryException;
 use WebTheory\Factory\Interfaces\ClassArgumentInterface;
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
@@ -17,20 +17,20 @@ class ClassArgumentResolver implements DependencyResolverInterface
         //
     }
 
-    public function resolve(string $item, string $query, array $args): ClassArgumentInterface
+    public function resolve(string $entry, string $query, array $args): ClassArgumentInterface
     {
-        return new ClassArgument($this->getClass($item, $query), $args);
+        return new ClassArgument($this->getClass($entry, $query), $args);
     }
 
-    protected function getClass(string $item, string $query): string
+    protected function getClass(string $entry, string $query): string
     {
-        return $this->getResolver($item)->getClass($query)
+        return $this->getResolver($entry)->getClass($query)
             ?: throw new UnresolvableQueryException($query);
     }
 
-    protected function getResolver(string $item): ClassResolverInterface
+    protected function getResolver(string $entry): ClassResolverInterface
     {
-        return $this->repository->getClassResolver($item)
-            ?: throw new UnresolvableItemException($item);
+        return $this->repository->getClassResolver($entry)
+            ?: throw new UnresolvableEntryException($entry);
     }
 }

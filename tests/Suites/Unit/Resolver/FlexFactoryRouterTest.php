@@ -5,7 +5,7 @@ namespace Tests\Suites\Unit\Resolver;
 use PHPUnit\Framework\MockObject\MockObject;
 use Tests\Support\Fixtures\DummyClass;
 use Tests\Support\UnitTestCase;
-use WebTheory\Factory\Exception\UnresolvableItemException;
+use WebTheory\Factory\Exception\UnresolvableEntryException;
 use WebTheory\Factory\Interfaces\DependencyResolverInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryRepositoryInterface;
@@ -32,7 +32,7 @@ class FlexFactoryRouterTest extends UnitTestCase
      */
     protected FlexFactoryInterface $factory;
 
-    protected string $item;
+    protected string $entry;
 
     protected string $query;
 
@@ -46,7 +46,7 @@ class FlexFactoryRouterTest extends UnitTestCase
 
         $this->factory = $mock(FlexFactoryInterface::class);
 
-        $this->item = $this->dummyArg();
+        $this->entry = $this->dummyArg();
         $this->query = $this->dummyArg();
         $this->args = $this->fakeAutoKeyedMap(5, 'sentence');
 
@@ -67,14 +67,14 @@ class FlexFactoryRouterTest extends UnitTestCase
      */
     public function it_returns_a_object_created_nested_resolver()
     {
-        $item = $this->item;
+        $entry = $this->entry;
         $query = $this->query;
         $args = $this->args;
         $expected = new DummyClass();
 
         $this->repository->expects($this->once())
             ->method(static::RESOLVER_RESOLUTION_METHOD)
-            ->with($item)
+            ->with($entry)
             ->willReturn($this->factory);
 
         $this->factory->expects($this->once())
@@ -82,7 +82,7 @@ class FlexFactoryRouterTest extends UnitTestCase
             ->with($query, $args)
             ->willReturn($expected);
 
-        $result = $this->sut->resolve($item, $query, $args);
+        $result = $this->sut->resolve($entry, $query, $args);
 
         $this->assertSame($expected, $result);
     }
@@ -90,10 +90,10 @@ class FlexFactoryRouterTest extends UnitTestCase
     /**
      * @test
      */
-    public function it_throws_an_exception_if_item_is_not_mapped_to_a_factory()
+    public function it_throws_an_exception_if_entry_is_not_mapped_to_a_factory()
     {
-        $this->expectException(UnresolvableItemException::class);
+        $this->expectException(UnresolvableEntryException::class);
 
-        $this->sut->resolve('invalid_item', $this->query, []);
+        $this->sut->resolve('invalid_entry', $this->query, []);
     }
 }

@@ -7,7 +7,7 @@ use stdClass;
 use Tests\Support\Fixtures\DummyClass;
 use Tests\Support\Fixtures\Namespaces\DummyNamespace1\DummyClass1;
 use Tests\Support\UnitTestCase;
-use WebTheory\Factory\Exception\UnresolvableItemException;
+use WebTheory\Factory\Exception\UnresolvableEntryException;
 use WebTheory\Factory\Exception\UnresolvableQueryException;
 use WebTheory\Factory\Exception\UnresolvableSubjectException;
 use WebTheory\Factory\Interfaces\ClassArgumentInterface;
@@ -37,7 +37,7 @@ class ClassResolverTreeTest extends UnitTestCase
      */
     protected ClassResolverInterface $resolver;
 
-    protected $classFor = DummyClass::class;
+    protected $subject = DummyClass::class;
 
     protected function setUp(): void
     {
@@ -49,7 +49,7 @@ class ClassResolverTreeTest extends UnitTestCase
         $this->repository = $mock(ClassResolverRepositoryInterface::class);
 
         $this->sut = new ClassResolverTree([
-            $this->classFor => $this->repository,
+            $this->subject => $this->repository,
         ]);
     }
 
@@ -65,14 +65,14 @@ class ClassResolverTreeTest extends UnitTestCase
      */
     public function it_returns_a_class_argument_instance_of_resolved_class_and_passed_args()
     {
-        $item = $this->dummyArg();
+        $entry = $this->dummyArg();
         $query = $this->dummyArg();
         $args = $this->fakeAutoKeyedMap(5, 'sentence');
         $expected = DummyClass1::class;
 
         $this->repository->expects($this->once())
             ->method(static::REPOSITORY_GET_RESOLVER_METHOD)
-            ->with($item)
+            ->with($entry)
             ->willReturn($this->resolver);
 
         $this->resolver->expects($this->once())
@@ -81,7 +81,7 @@ class ClassResolverTreeTest extends UnitTestCase
             ->willReturn($expected);
 
         /** @var ClassArgumentInterface */
-        $result = $this->sut->resolve($this->classFor, $item, $query, $args);
+        $result = $this->sut->resolve($this->subject, $entry, $query, $args);
 
         $this->assertSame($expected, $result->getClass());
         $this->assertSame($args, $result->getArgs());
@@ -105,15 +105,15 @@ class ClassResolverTreeTest extends UnitTestCase
     /**
      * @test
      */
-    public function it_throws_an_exception_if_item_argument_is_not_mapped_to_a_resolver()
+    public function it_throws_an_exception_if_entry_argument_is_not_mapped_to_a_resolver()
     {
         $this->repository->method(static::REPOSITORY_GET_RESOLVER_METHOD)
             ->willReturn(false);
 
-        $this->expectException(UnresolvableItemException::class);
+        $this->expectException(UnresolvableEntryException::class);
 
         $this->sut->resolve(
-            $this->classFor,
+            $this->subject,
             $this->dummyArg(),
             $this->dummyArg(),
             []
@@ -134,7 +134,7 @@ class ClassResolverTreeTest extends UnitTestCase
         $this->expectException(UnresolvableQueryException::class);
 
         $this->sut->resolve(
-            $this->classFor,
+            $this->subject,
             $this->dummyArg(),
             $this->dummyArg(),
             []

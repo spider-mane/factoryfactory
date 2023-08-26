@@ -2,7 +2,7 @@
 
 namespace WebTheory\Factory\Resolver;
 
-use WebTheory\Factory\Exception\UnresolvableItemException;
+use WebTheory\Factory\Exception\UnresolvableEntryException;
 use WebTheory\Factory\Interfaces\DependencyResolverInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryRepositoryInterface;
@@ -14,14 +14,14 @@ class FlexFactoryRouter implements DependencyResolverInterface
         //
     }
 
-    public function resolve(string $item, string $query, array $args): object
+    public function resolve(string $entry, string $query, array $args): object
     {
-        return $this->getHandler($item)->create($query, $args);
+        return $this->getHandler($entry)->create($query, $args);
     }
 
-    protected function getHandler(string $item): FlexFactoryInterface
+    protected function getHandler(string $entry): FlexFactoryInterface
     {
-        return $this->repository->getTypeFactory($item)
-            ?: throw new UnresolvableItemException($item);
+        return $this->repository->getTypeFactory($entry)
+            ?: throw new UnresolvableEntryException($entry);
     }
 }

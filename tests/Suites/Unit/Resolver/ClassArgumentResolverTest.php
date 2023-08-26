@@ -5,7 +5,7 @@ namespace Tests\Suites\Unit\Resolver;
 use PHPUnit\Framework\MockObject\MockObject;
 use Tests\Support\Fixtures\DummyClass;
 use Tests\Support\UnitTestCase;
-use WebTheory\Factory\Exception\UnresolvableItemException;
+use WebTheory\Factory\Exception\UnresolvableEntryException;
 use WebTheory\Factory\Exception\UnresolvableQueryException;
 use WebTheory\Factory\Interfaces\ClassArgumentInterface;
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
@@ -57,14 +57,14 @@ class ClassArgumentResolverTest extends UnitTestCase
      */
     public function it_returns_a_class_argument_using_the_query_and_args()
     {
-        $item = $this->dummyArg();
+        $entry = $this->dummyArg();
         $query = $this->dummyArg();
         $args = $this->dummyArgs();
         $class = DummyClass::class;
 
         $this->repository->expects($this->once())
             ->method(static::REPOSITORY_QUERY_METHOD)
-            ->with($item)
+            ->with($entry)
             ->willReturn($this->resolver);
 
         $this->resolver->expects($this->once())
@@ -73,7 +73,7 @@ class ClassArgumentResolverTest extends UnitTestCase
             ->willReturn($class);
 
         /** @var ClassArgumentInterface */
-        $result = $this->sut->resolve($item, $query, $args);
+        $result = $this->sut->resolve($entry, $query, $args);
 
         $this->assertInstanceOf(ClassArgumentInterface::class, $result);
         $this->assertSame($class, $result->getClass());
@@ -88,7 +88,7 @@ class ClassArgumentResolverTest extends UnitTestCase
         $this->repository->method(static::REPOSITORY_QUERY_METHOD)
             ->willReturn(false);
 
-        $this->expectException(UnresolvableItemException::class);
+        $this->expectException(UnresolvableEntryException::class);
 
         $this->sut->resolve(
             $this->dummyArg(),

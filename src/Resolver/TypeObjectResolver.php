@@ -15,7 +15,7 @@ class TypeObjectResolver implements ObjectResolverInterface
         //
     }
 
-    public function resolveObject(string $item, string $query, array $args, ReflectionParameter $param): object
+    public function resolveObject(string $entry, string $query, array $args, ReflectionParameter $param): object
     {
         $type = $this->getType($param);
 

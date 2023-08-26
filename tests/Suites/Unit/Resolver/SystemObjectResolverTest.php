@@ -53,7 +53,7 @@ class SystemObjectResolverTest extends UnitTestCase
     public function it_returns_object_created_by_resolver()
     {
         $param = $this->reflectionParameter;
-        $item = $this->fake->word();
+        $entry = $this->fake->word();
         $query = $this->fake->word();
         $args = $this->fakeAutoKeyedMap(7, 'sentence');
         $class = DummyClass::class;
@@ -68,11 +68,11 @@ class SystemObjectResolverTest extends UnitTestCase
         # Expect
         $this->resolver->expects($this->once())
             ->method(static::RESOLVER_RESOLUTION_METHOD)
-            ->with($class, $item, $query, $args)
+            ->with($class, $entry, $query, $args)
             ->willReturn($expected);
 
         # Act
-        $result = $this->sut->resolveObject($item, $query, $args, $param);
+        $result = $this->sut->resolveObject($entry, $query, $args, $param);
 
         # Assert
         $this->assertSame($expected, $result);

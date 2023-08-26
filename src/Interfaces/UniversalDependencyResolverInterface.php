@@ -5,8 +5,8 @@ namespace WebTheory\Factory\Interfaces;
 interface UniversalDependencyResolverInterface
 {
     /**
-     * @param class-string $for The class where the entry is defined
-     * @param string $item The entrypoint on the provided class, mapped to a constructor parameter or setter method
+     * @param class-string $subject The class where the entry is defined
+     * @param string $entry The entrypoint on the subject class, mapped to a constructor parameter or setter method
      * @param string $query Class argument to be resolved
      * @param array $args Arguments for building the queried class
      *
@@ -14,5 +14,5 @@ interface UniversalDependencyResolverInterface
      *
      * @throws ArgTransformationExceptionInterface
      */
-    public function resolve(string $for, string $item, string $query, array $args): object;
+    public function resolve(string $subject, string $entry, string $query, array $args): object;
 }

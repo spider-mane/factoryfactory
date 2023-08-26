@@ -13,8 +13,8 @@ class ClassEntryObjectResolver implements ObjectResolverInterface
         //
     }
 
-    public function resolveObject(string $item, string $query, array $args, ReflectionParameter $param): object
+    public function resolveObject(string $entry, string $query, array $args, ReflectionParameter $param): object
     {
-        return $this->resolver->resolve($item, $query, $args);
+        return $this->resolver->resolve($entry, $query, $args);
     }
 }

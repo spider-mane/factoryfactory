@@ -57,14 +57,14 @@ class ClassArgumentTypesTest extends UnitTestCase
      */
     public function it_returns_a_class_argument_using_the_query_and_args()
     {
-        $item = $this->dummyArg();
+        $entry = $this->dummyArg();
         $query = $this->dummyArg();
         $args = $this->dummyArgs();
         $class = DummyClass::class;
 
         $this->repository->expects($this->once())
             ->method(static::REPOSITORY_QUERY_METHOD)
-            ->with($item)
+            ->with($entry)
             ->willReturn($this->resolver);
 
         $this->resolver->expects($this->once())
@@ -73,7 +73,7 @@ class ClassArgumentTypesTest extends UnitTestCase
             ->willReturn($class);
 
         /** @var ClassArgumentInterface */
-        $result = $this->sut->cast($item, $query, $args);
+        $result = $this->sut->cast($entry, $query, $args);
 
         $this->assertInstanceOf(ClassArgumentInterface::class, $result);
         $this->assertSame($class, $result->getClass());

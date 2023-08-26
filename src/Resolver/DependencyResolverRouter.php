@@ -17,9 +17,9 @@ class DependencyResolverRouter implements UniversalDependencyResolverInterface
         //
     }
 
-    public function resolve(string $for, string $item, string $query, array $args): object
+    public function resolve(string $subject, string $entry, string $query, array $args): object
     {
-        return $this->getResolver($for)->resolve($item, $query, $args);
+        return $this->getResolver($subject)->resolve($entry, $query, $args);
     }
 
     protected function getResolver(string $class): DependencyResolverInterface

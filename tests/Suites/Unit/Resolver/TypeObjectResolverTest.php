@@ -62,7 +62,7 @@ class TypeObjectResolverTest extends UnitTestCase
     public function it_returns_object_created_by_resolver()
     {
         $param = $this->reflectionParameter;
-        $item = $this->dummyArg();
+        $entry = $this->dummyArg();
         $query = $this->dummyArg();
         $args = $this->dummyArgs();
         $type = DummyClass::class;
@@ -81,7 +81,7 @@ class TypeObjectResolverTest extends UnitTestCase
             ->willReturn($expected);
 
         # Act
-        $result = $this->sut->resolveObject($item, $query, $args, $param);
+        $result = $this->sut->resolveObject($entry, $query, $args, $param);
 
         # Assert
         $this->assertSame($expected, $result);

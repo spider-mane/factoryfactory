@@ -13,11 +13,11 @@ class SystemObjectResolver implements ObjectResolverInterface
         //
     }
 
-    public function resolveObject(string $item, string $query, array $args, ReflectionParameter $param): object
+    public function resolveObject(string $entry, string $query, array $args, ReflectionParameter $param): object
     {
-        $for = $this->getSubject($param);
+        $subject = $this->getSubject($param);
 
-        return $this->resolver->resolve($for, $item, $query, $args);
+        return $this->resolver->resolve($subject, $entry, $query, $args);
     }
 
     protected function getSubject(ReflectionParameter $param): string

@@ -6,7 +6,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use stdClass;
 use Tests\Support\Fixtures\DummyClass;
 use Tests\Support\UnitTestCase;
-use WebTheory\Factory\Exception\UnresolvableItemException;
+use WebTheory\Factory\Exception\UnresolvableEntryException;
 use WebTheory\Factory\Exception\UnresolvableSubjectException;
 use WebTheory\Factory\Interfaces\FlexFactoryInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryRepositoryInterface;
@@ -36,7 +36,7 @@ class FlexFactoryTreeTest extends UnitTestCase
 
     protected string $class = DummyClass::class;
 
-    protected string $item;
+    protected string $entry;
 
     protected string $query;
 
@@ -49,7 +49,7 @@ class FlexFactoryTreeTest extends UnitTestCase
         $this->repository = $mock(FlexFactoryRepositoryInterface::class);
         $this->factory = $mock(FlexFactoryInterface::class);
 
-        $this->item = $this->dummyArg();
+        $this->entry = $this->dummyArg();
         $this->query = $this->dummyArg();
 
         $this->sut = new FlexFactoryTree([
@@ -70,14 +70,14 @@ class FlexFactoryTreeTest extends UnitTestCase
     public function it_returns_a_object_created_by_factory_resolved_by_repository()
     {
         $class = $this->class;
-        $item = $this->item;
+        $entry = $this->entry;
         $query = $this->query;
         $args = $this->fakeAutoKeyedMap(5, 'sentence');
         $expected = new DummyClass();
 
         $this->repository->expects($this->once())
             ->method(static::REPOSITORY_GET_FACTORY_METHOD)
-            ->with($item)
+            ->with($entry)
             ->willReturn($this->factory);
 
         $this->factory->expects($this->once())
@@ -85,7 +85,7 @@ class FlexFactoryTreeTest extends UnitTestCase
             ->with($query, $args)
             ->willReturn($expected);
 
-        $result = $this->sut->resolve($class, $item, $query, $args);
+        $result = $this->sut->resolve($class, $entry, $query, $args);
 
         $this->assertSame($expected, $result);
     }
@@ -97,19 +97,19 @@ class FlexFactoryTreeTest extends UnitTestCase
     {
         $this->expectException(UnresolvableSubjectException::class);
 
-        $this->sut->resolve(stdClass::class, $this->item, $this->query, []);
+        $this->sut->resolve(stdClass::class, $this->entry, $this->query, []);
     }
 
     /**
      * @test
      */
-    public function it_throws_an_exception_if_item_is_not_mapped_to_a_factory()
+    public function it_throws_an_exception_if_entry_is_not_mapped_to_a_factory()
     {
         $this->repository->method(static::REPOSITORY_GET_FACTORY_METHOD)
             ->willReturn(false);
 
-        $this->expectException(UnresolvableItemException::class);
+        $this->expectException(UnresolvableEntryException::class);
 
-        $this->sut->resolve($this->class, $this->item, $this->query, []);
+        $this->sut->resolve($this->class, $this->entry, $this->query, []);
     }
 }

@@ -3,7 +3,7 @@
 namespace WebTheory\Factory\Resolver;
 
 use ArrayAccess;
-use WebTheory\Factory\Exception\UnresolvableItemException;
+use WebTheory\Factory\Exception\UnresolvableEntryException;
 use WebTheory\Factory\Exception\UnresolvableSubjectException;
 use WebTheory\Factory\Interfaces\FlexFactoryInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryRepositoryInterface;
@@ -19,15 +19,15 @@ class FlexFactoryTree implements UniversalDependencyResolverInterface
         //
     }
 
-    public function resolve(string $for, string $item, string $query, array $args): object
+    public function resolve(string $subject, string $entry, string $query, array $args): object
     {
-        return $this->getFactory($for, $item)->create($query, $args);
+        return $this->getFactory($subject, $entry)->create($query, $args);
     }
 
-    protected function getFactory(string $class, string $item): FlexFactoryInterface
+    protected function getFactory(string $class, string $entry): FlexFactoryInterface
     {
-        return $this->getRepository($class)->getTypeFactory($item)
-            ?: throw new UnresolvableItemException($item);
+        return $this->getRepository($class)->getTypeFactory($entry)
+            ?: throw new UnresolvableEntryException($entry);
     }
 
     protected function getRepository(string $class): FlexFactoryRepositoryInterface
