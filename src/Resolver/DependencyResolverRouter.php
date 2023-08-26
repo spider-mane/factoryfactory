@@ -3,14 +3,12 @@
 namespace WebTheory\Factory\Resolver;
 
 use ArrayAccess;
-use WebTheory\Factory\Abstracts\ResolutionEndpointTrait;
+use WebTheory\Factory\Exception\UnresolvableSubjectException;
 use WebTheory\Factory\Interfaces\DependencyResolverInterface;
 use WebTheory\Factory\Interfaces\UniversalDependencyResolverInterface;
 
 class DependencyResolverRouter implements UniversalDependencyResolverInterface
 {
-    use ResolutionEndpointTrait;
-
     /**
      * @param array<class-string, DependencyResolverInterface> $resolvers
      */
@@ -27,6 +25,6 @@ class DependencyResolverRouter implements UniversalDependencyResolverInterface
     protected function getResolver(string $class): DependencyResolverInterface
     {
         return $this->resolvers[$class]
-            ?? throw $this->unresolvableSubjectException($class);
+            ?? throw new UnresolvableSubjectException($class);
     }
 }

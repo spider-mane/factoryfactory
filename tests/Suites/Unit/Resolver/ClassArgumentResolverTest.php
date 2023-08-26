@@ -1,20 +1,20 @@
 <?php
 
-namespace Tests\Suites\Unit\Transformation;
+namespace Tests\Suites\Unit\Resolver;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use ReflectionParameter;
-use stdClass;
-use Tests\Support\Bases\PolicyDeferredTransformerTestCase;
+use Tests\Support\Fixtures\DummyClass;
+use Tests\Support\UnitTestCase;
 use WebTheory\Factory\Exception\UnresolvableItemException;
 use WebTheory\Factory\Exception\UnresolvableQueryException;
 use WebTheory\Factory\Interfaces\ClassArgumentInterface;
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
 use WebTheory\Factory\Interfaces\ClassResolverRepositoryInterface;
-use WebTheory\Factory\Transformation\ClassArgumentResolver;
+use WebTheory\Factory\Interfaces\DependencyResolverInterface;
+use WebTheory\Factory\Resolver\ClassArgumentResolver;
 use WebTheory\UnitUtils\Partials\HasExpectedTypes;
 
-class ClassArgumentResolverTest extends PolicyDeferredTransformerTestCase
+class ClassArgumentResolverTest extends UnitTestCase
 {
     use HasExpectedTypes;
 
@@ -23,8 +23,6 @@ class ClassArgumentResolverTest extends PolicyDeferredTransformerTestCase
     protected const RESOLVER_QUERY_METHOD = 'getClass';
 
     protected ClassArgumentResolver $sut;
-
-    protected string $classKey = '@create';
 
     /**
      * @var MockObject&ClassResolverRepositoryInterface
@@ -36,53 +34,50 @@ class ClassArgumentResolverTest extends PolicyDeferredTransformerTestCase
      */
     protected ClassResolverInterface $resolver;
 
-    /**
-     * @var MockObject&ReflectionParameter
-     */
-    protected ReflectionParameter $parameter;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $mock = [$this, 'createMock'];
-
-        $this->resolver = $mock(ClassResolverInterface::class);
-        $this->parameter = $mock(ReflectionParameter::class);
+        $this->resolver = $this->createMock(ClassResolverInterface::class);
 
         $this->sut = new ClassArgumentResolver(
-            $this->repository = $mock(ClassResolverRepositoryInterface::class),
-            $this->policy
+            $this->repository = $this->createMock(ClassResolverRepositoryInterface::class)
         );
+    }
+
+    protected function defineExpectedTypesData(callable $ds): array
+    {
+        return [
+            $ds($t = DependencyResolverInterface::class) => [$t],
+        ];
     }
 
     /**
      * @test
      */
-    public function it_resolves_an_array_argument_into_a_class_argument_instance()
+    public function it_returns_a_class_argument_using_the_query_and_args()
     {
-        $argsToPass = $this->fakeAutoKeyedMap(10, 'word', 'streetName');
-        $key = $this->unique->word();
-        $classArg = $this->unique->word();
-        $initialArgs = [$this->classKey => $classArg] + $argsToPass;
-        $class = stdClass::class;
+        $item = $this->dummyArg();
+        $query = $this->dummyArg();
+        $args = $this->dummyArgs();
+        $class = DummyClass::class;
 
-        $this->configurePolicy(true, $classArg, $argsToPass);
-
-        $this->repository->method(static::REPOSITORY_QUERY_METHOD)
-            ->with($key)
+        $this->repository->expects($this->once())
+            ->method(static::REPOSITORY_QUERY_METHOD)
+            ->with($item)
             ->willReturn($this->resolver);
 
-        $this->resolver->method(static::RESOLVER_QUERY_METHOD)
-            ->with($classArg)
+        $this->resolver->expects($this->once())
+            ->method(static::RESOLVER_QUERY_METHOD)
+            ->with($query)
             ->willReturn($class);
 
         /** @var ClassArgumentInterface */
-        $result = $this->sut->transformArg($key, $initialArgs, $this->parameter);
+        $result = $this->sut->resolve($item, $query, $args);
 
         $this->assertInstanceOf(ClassArgumentInterface::class, $result);
         $this->assertSame($class, $result->getClass());
-        $this->assertSame($argsToPass, $result->getArgs());
+        $this->assertSame($args, $result->getArgs());
     }
 
     /**
@@ -90,17 +85,15 @@ class ClassArgumentResolverTest extends PolicyDeferredTransformerTestCase
      */
     public function it_throws_an_exception_if_repository_cannot_resolve_resolver()
     {
-        $this->configurePolicy(true);
-
         $this->repository->method(static::REPOSITORY_QUERY_METHOD)
             ->willReturn(false);
 
         $this->expectException(UnresolvableItemException::class);
 
-        $this->sut->transformArg(
-            $this->fake->slug(),
-            [$this->classKey => $this->fake->word()],
-            $this->parameter
+        $this->sut->resolve(
+            $this->dummyArg(),
+            $this->dummyArg(),
+            $this->dummyArgs()
         );
     }
 
@@ -109,8 +102,6 @@ class ClassArgumentResolverTest extends PolicyDeferredTransformerTestCase
      */
     public function it_throws_an_exception_if_it_resolver_cannot_resolve_class()
     {
-        $this->configurePolicy(true);
-
         $this->repository->method(static::REPOSITORY_QUERY_METHOD)
             ->willReturn($this->resolver);
 
@@ -119,10 +110,10 @@ class ClassArgumentResolverTest extends PolicyDeferredTransformerTestCase
 
         $this->expectException(UnresolvableQueryException::class);
 
-        $this->sut->transformArg(
-            $this->fake->slug(),
-            [$this->classKey => $this->fake->word()],
-            $this->parameter
+        $this->sut->resolve(
+            $this->dummyArg(),
+            $this->dummyArg(),
+            $this->dummyArgs()
         );
     }
 }

@@ -3,15 +3,14 @@
 namespace WebTheory\Factory\Resolver;
 
 use ArrayAccess;
-use WebTheory\Factory\Abstracts\ResolutionEndpointTrait;
+use WebTheory\Factory\Exception\UnresolvableItemException;
+use WebTheory\Factory\Exception\UnresolvableSubjectException;
 use WebTheory\Factory\Interfaces\FlexFactoryInterface;
 use WebTheory\Factory\Interfaces\FlexFactoryRepositoryInterface;
 use WebTheory\Factory\Interfaces\UniversalDependencyResolverInterface;
 
 class FlexFactoryTree implements UniversalDependencyResolverInterface
 {
-    use ResolutionEndpointTrait;
-
     /**
      * @param array<class-string, FlexFactoryRepositoryInterface> $tree
      */
@@ -28,12 +27,12 @@ class FlexFactoryTree implements UniversalDependencyResolverInterface
     protected function getFactory(string $class, string $item): FlexFactoryInterface
     {
         return $this->getRepository($class)->getTypeFactory($item)
-            ?: throw $this->unresolvableItemException($item);
+            ?: throw new UnresolvableItemException($item);
     }
 
     protected function getRepository(string $class): FlexFactoryRepositoryInterface
     {
         return $this->tree[$class]
-            ?? throw $this->unresolvableSubjectException($class);
+            ?? throw new UnresolvableSubjectException($class);
     }
 }

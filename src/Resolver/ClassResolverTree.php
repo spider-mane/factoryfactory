@@ -3,7 +3,9 @@
 namespace WebTheory\Factory\Resolver;
 
 use ArrayAccess;
-use WebTheory\Factory\Abstracts\ResolutionEndpointTrait;
+use WebTheory\Factory\Exception\UnresolvableItemException;
+use WebTheory\Factory\Exception\UnresolvableQueryException;
+use WebTheory\Factory\Exception\UnresolvableSubjectException;
 use WebTheory\Factory\Interfaces\ClassArgumentInterface;
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
 use WebTheory\Factory\Interfaces\ClassResolverRepositoryInterface;
@@ -12,8 +14,6 @@ use WebTheory\Factory\Transformation\ClassArgument;
 
 class ClassResolverTree implements UniversalDependencyResolverInterface
 {
-    use ResolutionEndpointTrait;
-
     /**
      * @param array<class-string, ClassResolverRepositoryInterface> $repositories
      */
@@ -30,18 +30,18 @@ class ClassResolverTree implements UniversalDependencyResolverInterface
     protected function getClass(string $for, string $item, string $query): string
     {
         return $this->getResolver($for, $item)->getClass($query)
-            ?: throw $this->unresolvableQueryException($query);
+            ?: throw new UnresolvableQueryException($query);
     }
 
     protected function getResolver(string $class, string $item): ClassResolverInterface
     {
         return $this->getRepository($class)->getClassResolver($item)
-            ?: throw $this->unresolvableItemException($item);
+            ?: throw new UnresolvableItemException($item);
     }
 
     protected function getRepository(string $class): ClassResolverRepositoryInterface
     {
         return $this->repositories[$class]
-            ?? throw $this->unresolvableSubjectException($class);
+            ?? throw new UnresolvableSubjectException($class);
     }
 }

@@ -1,28 +1,34 @@
 <?php
 
-namespace Tests\Suites\Unit\Transformation;
+namespace Tests\Suites\Unit\Resolver;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionClass;
-use Tests\Support\Bases\PolicyDeferredTransformerTestCase;
+use ReflectionParameter;
 use Tests\Support\Fixtures\DummyClass;
+use Tests\Support\UnitTestCase;
 use WebTheory\Factory\Interfaces\UniversalDependencyResolverInterface;
-use WebTheory\Factory\Transformation\SystemicDependencyTranslations;
+use WebTheory\Factory\Resolver\SystemObjectResolver;
 
-class SystemicDependencyTranslationsTest extends PolicyDeferredTransformerTestCase
+class SystemObjectResolverTest extends UnitTestCase
 {
     protected const RESOLVER_RESOLUTION_METHOD = 'resolve';
 
-    protected const REFLECTION_CLASS_GET_NAME_METHOD = 'getName';
-
     protected const PARAMETER_GET_CLASS_METHOD = 'getDeclaringClass';
 
-    protected SystemicDependencyTranslations $sut;
+    protected const REFLECTION_CLASS_GET_NAME_METHOD = 'getName';
+
+    protected SystemObjectResolver $sut;
 
     /**
      * @var MockObject&UniversalDependencyResolverInterface
      */
     protected UniversalDependencyResolverInterface $resolver;
+
+    /**
+     * @var MockObject&ReflectionParameter
+     */
+    protected ReflectionParameter $reflectionParameter;
 
     /**
      * @var MockObject&ReflectionClass
@@ -33,13 +39,11 @@ class SystemicDependencyTranslationsTest extends PolicyDeferredTransformerTestCa
     {
         parent::setUp();
 
-        $mock = [$this, 'createMock'];
+        $this->reflectionParameter = $this->createMock(ReflectionParameter::class);
+        $this->reflectionClass = $this->createMock(ReflectionClass::class);
 
-        $this->reflectionClass = $mock(ReflectionClass::class);
-
-        $this->sut = new SystemicDependencyTranslations(
-            $this->resolver = $mock(UniversalDependencyResolverInterface::class),
-            $this->policy
+        $this->sut = new SystemObjectResolver(
+            $this->resolver = $this->createMock(UniversalDependencyResolverInterface::class)
         );
     }
 
@@ -48,20 +52,18 @@ class SystemicDependencyTranslationsTest extends PolicyDeferredTransformerTestCa
      */
     public function it_returns_object_created_by_resolver()
     {
+        $param = $this->reflectionParameter;
         $item = $this->fake->word();
         $query = $this->fake->word();
         $args = $this->fakeAutoKeyedMap(7, 'sentence');
-        $initial = [$item => $query] + $args;
         $class = DummyClass::class;
         $expected = new $class();
 
-        $this->configurePolicy(true, $query, $args);
+        $this->reflectionParameter->method(static::PARAMETER_GET_CLASS_METHOD)
+            ->willReturn($this->reflectionClass);
 
         $this->reflectionClass->method(static::REFLECTION_CLASS_GET_NAME_METHOD)
             ->willReturn($class);
-
-        $this->parameter->method(static::PARAMETER_GET_CLASS_METHOD)
-            ->willReturn($this->reflectionClass);
 
         # Expect
         $this->resolver->expects($this->once())
@@ -70,7 +72,7 @@ class SystemicDependencyTranslationsTest extends PolicyDeferredTransformerTestCa
             ->willReturn($expected);
 
         # Act
-        $result = $this->sut->transformArg($item, $initial, $this->parameter);
+        $result = $this->sut->resolveObject($item, $query, $args, $param);
 
         # Assert
         $this->assertSame($expected, $result);

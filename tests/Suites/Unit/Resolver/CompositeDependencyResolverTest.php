@@ -4,20 +4,19 @@ namespace Tests\Suites\Unit\Resolver;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Tests\Support\Bases\CompositeObjectResolverTestCase;
-use Tests\Support\Fixtures\DummyClass;
-use WebTheory\Factory\Interfaces\UniversalDependencyResolverInterface;
-use WebTheory\Factory\Resolver\CompositeUniversalDependencyResolver;
+use WebTheory\Factory\Interfaces\DependencyResolverInterface;
+use WebTheory\Factory\Resolver\CompositeDependencyResolver;
 
-class CompositeUniversalDependencyResolverTest extends CompositeObjectResolverTestCase
+class CompositeDependencyResolverTest extends CompositeObjectResolverTestCase
 {
     protected const SUT_METHOD = 'resolve';
 
     protected const COMPONENTS = 'resolvers';
 
-    protected CompositeUniversalDependencyResolver $sut;
+    protected CompositeDependencyResolver $sut;
 
     /**
-     * @var list<MockObject&UniversalDependencyResolverInterface>
+     * @var list<MockObject&DependencyResolverInterface>
      */
     protected array $resolvers;
 
@@ -26,13 +25,13 @@ class CompositeUniversalDependencyResolverTest extends CompositeObjectResolverTe
         parent::setUp();
 
         $this->resolvers = $this->dummyList(
-            fn () => $this->createMock(UniversalDependencyResolverInterface::class),
+            fn () => $this->createMock(DependencyResolverInterface::class),
             5
         );
 
         $this->initExceptions();
 
-        $this->sut = new CompositeUniversalDependencyResolver(
+        $this->sut = new CompositeDependencyResolver(
             ...$this->resolvers
         );
     }
@@ -40,7 +39,6 @@ class CompositeUniversalDependencyResolverTest extends CompositeObjectResolverTe
     protected function sutMethodArgs(): array
     {
         return [
-            DummyClass::class,
             $this->dummyArg(),
             $this->dummyArg(),
             $this->dummyArgs(),

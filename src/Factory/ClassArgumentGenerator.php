@@ -2,7 +2,7 @@
 
 namespace WebTheory\Factory\Factory;
 
-use WebTheory\Factory\Abstracts\ResolutionEndpointTrait;
+use WebTheory\Factory\Exception\UnresolvableQueryException;
 use WebTheory\Factory\Interfaces\ClassArgumentGeneratorInterface;
 use WebTheory\Factory\Interfaces\ClassArgumentInterface;
 use WebTheory\Factory\Interfaces\ClassResolverInterface;
@@ -10,8 +10,6 @@ use WebTheory\Factory\Transformation\ClassArgument;
 
 class ClassArgumentGenerator implements ClassArgumentGeneratorInterface
 {
-    use ResolutionEndpointTrait;
-
     public function __construct(protected ClassResolverInterface $classResolver)
     {
         //
@@ -25,6 +23,6 @@ class ClassArgumentGenerator implements ClassArgumentGeneratorInterface
     protected function getClass(string $query): string
     {
         return $this->classResolver->getClass($query)
-            ?: throw $this->unresolvableQueryException($query);
+            ?: throw new UnresolvableQueryException($query);
     }
 }
